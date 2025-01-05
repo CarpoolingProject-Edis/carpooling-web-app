@@ -44,15 +44,8 @@ Carpooling is a web application that enables users to share travel plans or join
 3. Set environment variables in `.env` file.
 4. Run the development server: `npm start`.
 
----
-
-## Database
-
-### Schema Diagram
-![Database Schema](database/ERD.png)
-
 ### Setup
-1. Run `schema.sql` to create the database structure.
+1. Run `carpoolschema.sql` to create the database structure.
 2. Run `seed.sql` to populate with sample data.
 
 ---
