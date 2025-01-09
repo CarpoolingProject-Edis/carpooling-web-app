@@ -29,14 +29,16 @@ public class HibernateConfig {
         dbPassword = env.getProperty("database.password");
     }
 
+
     @Bean(name = "entityManagerFactory")
     public LocalSessionFactoryBean entityManagerFactory() {
-        LocalSessionFactoryBean entityManagerFactory = new LocalSessionFactoryBean();
-        entityManagerFactory.setDataSource(dataSource());
-        entityManagerFactory.setPackagesToScan("com.example.demo.models");
-        entityManagerFactory.setHibernateProperties(hibernateProperties());
-        return entityManagerFactory;
+        LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
+        sessionFactory.setDataSource(dataSource());
+        sessionFactory.setPackagesToScan("com.carpooling.main.model"); // Model package to scan for entities
+        sessionFactory.setHibernateProperties(hibernateProperties());
+        return sessionFactory;
     }
+
     @Bean
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
@@ -47,23 +49,13 @@ public class HibernateConfig {
         return dataSource;
     }
 
-    public LocalContainerEntityManagerFactoryBean entityManagerFactoryBean(
-            EntityManagerFactoryBuilder builder,
-            DataSource dataSource) {
-        return  builder
-                .dataSource(dataSource)
-                .packages("com.example.demo.models")
-                .persistenceUnit("jobmatchPu")
-                .build();
-
-    }
-
     private Properties hibernateProperties() {
-        Properties hibernateProperties = new Properties();
-        hibernateProperties.setProperty("hibernate.dialect", "org.hibernate.dialect.MariaDBDialect");
-        hibernateProperties.setProperty("hibernate.show_sql", "true");
-        hibernateProperties.setProperty("hibernate.format_sql", "true");
-        return hibernateProperties;
+        Properties properties = new Properties();
+        properties.setProperty("hibernate.dialect", "org.hibernate.dialect.MariaDBDialect");
+        properties.setProperty("hibernate.show_sql", "true");
+        properties.setProperty("hibernate.format_sql", "true");
+        properties.setProperty("hibernate.hbm2ddl.auto", "update"); // or "validate" for production
+        return properties;
     }
 
 }
