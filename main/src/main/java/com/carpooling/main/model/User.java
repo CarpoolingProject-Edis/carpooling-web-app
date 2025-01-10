@@ -40,6 +40,10 @@ public class User {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
+    public String getFullName() {
+        return firstName + " " + lastName;
+    }
+
     public User() {
     }
 
