@@ -10,13 +10,13 @@ public class ApplicationDTO {
     private Integer travelId;
     private String travelStartPoint;
     private String travelEndPoint;
-    private Integer userId;
+    private Long userId;
     private String userName;
     private ApplicationStatus status;
     private LocalDateTime appliedAt;
 
     public ApplicationDTO(Integer applicationId, Integer travelId, String travelStartPoint,
-                          String travelEndPoint, Integer userId, String userName,
+                          String travelEndPoint, Long userId, String userName,
                           ApplicationStatus status, LocalDateTime appliedAt) {
         this.applicationId = applicationId;
         this.travelId = travelId;
@@ -60,11 +60,11 @@ public class ApplicationDTO {
         this.travelEndPoint = travelEndPoint;
     }
 
-    public Integer getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(Integer userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 
