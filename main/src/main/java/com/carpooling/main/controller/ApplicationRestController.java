@@ -16,11 +16,11 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/applications")
-public class ApplicationController {
+public class ApplicationRestController {
 
     private final ApplicationService applicationService;
 
-    public ApplicationController(ApplicationService applicationService) {
+    public ApplicationRestController(ApplicationService applicationService) {
         this.applicationService = applicationService;
     }
 
