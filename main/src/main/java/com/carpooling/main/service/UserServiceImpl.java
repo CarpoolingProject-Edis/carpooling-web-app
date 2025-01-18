@@ -34,10 +34,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User saveUser(User user) {
-        if (user == null || user.getUsername() == null || user.getEmail() == null) {
-            logger.error("Invalid user data: {}", user);
+        if (user == null || user.getUsername() == null || user.getEmail() == null || user.getPassword() == null) {
             throw new IllegalArgumentException("User details cannot be null");
         }
+
+
         logger.info("Saving user: {}", user);
         return userRepository.save(user);
     }
@@ -50,5 +51,10 @@ public class UserServiceImpl implements UserService {
                     logger.error("User not found with email: {}", email);
                     return new UserNotFoundException("User not found with email: " + email);
                 });
+    }
+
+    @Override
+    public boolean existsByUsername(String username) {
+        return userRepository.findByUsername(username).isPresent();
     }
 }
