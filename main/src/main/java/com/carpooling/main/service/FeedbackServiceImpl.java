@@ -1,5 +1,7 @@
 package com.carpooling.main.service;
 
+import com.carpooling.main.exceptions.EntityDuplicateException;
+import com.carpooling.main.exceptions.EntityNotFoundException;
 import com.carpooling.main.model.Feedback;
 import com.carpooling.main.model.User;
 import com.carpooling.main.repository.interfaces.FeedbackRepository;
@@ -21,7 +23,7 @@ public class FeedbackServiceImpl implements FeedbackService {
     @Autowired
     public FeedbackServiceImpl(FeedbackRepository feedbackRepository,
                                UserRepository userRepository) {
-        this.feedbackRepository = feedbackRepository;;
+        this.feedbackRepository = feedbackRepository;
         this.userRepository = userRepository;
     }
 
