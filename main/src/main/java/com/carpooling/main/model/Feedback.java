@@ -1,97 +1,71 @@
 package com.carpooling.main.model;
 
-import com.carpooling.main.enums.Rating;
 import jakarta.persistence.*;
-import org.hibernate.annotations.CreationTimestamp;
-
-import java.time.LocalDateTime;
-
 
 @Entity
-@Table(name = "feedback")
+@Table(name = "feedbacks")
 public class Feedback {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer feedbackId;
+    @Column(name = "id")
+    private int id;
 
     @ManyToOne
-    @JoinColumn(name = "TravelID", nullable = false)
-    private Travel travel;
+    @JoinColumn(name = "giver_id")
+    private User createdBy;
 
     @ManyToOne
-    @JoinColumn(name = "FromUserID", nullable = false)
-    private User fromUser;
+    @JoinColumn(name = "receiver_id")
+    private User receivedBy;
 
     @ManyToOne
-    @JoinColumn(name = "ToUserID", nullable = false)
-    private User toUser;
+    @JoinColumn(name = "travel_id")
+    private Travel travelToRate;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Rating rating;
-
-    private String comment;
-
-    @Column(nullable = false, updatable = false)
-    @CreationTimestamp
-    private LocalDateTime createdAt;
+    @Column(name = "rating")
+    private int rating;
 
     public Feedback() {
     }
 
-    public Integer getFeedbackId() {
-        return feedbackId;
+    public int getId() {
+        return id;
     }
 
-    public void setFeedbackId(Integer feedbackId) {
-        this.feedbackId = feedbackId;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public Travel getTravel() {
-        return travel;
+    public User getCreatedBy() {
+        return createdBy;
     }
 
-    public void setTravel(Travel travel) {
-        this.travel = travel;
+    public void setCreatedBy(User createdBy) {
+        this.createdBy = createdBy;
     }
 
-    public User getFromUser() {
-        return fromUser;
+    public User getReceivedBy() {
+        return receivedBy;
     }
 
-    public void setFromUser(User fromUser) {
-        this.fromUser = fromUser;
+    public void setReceivedBy(User receivedBy) {
+        this.receivedBy = receivedBy;
     }
 
-    public User getToUser() {
-        return toUser;
+    public Travel getTravelToRate() {
+        return travelToRate;
     }
 
-    public void setToUser(User toUser) {
-        this.toUser = toUser;
+    public void setTravelToRate(Travel travelToRate) {
+        this.travelToRate = travelToRate;
     }
 
-    public Rating getRating() {
+    public int getRating() {
         return rating;
     }
 
-    public void setRating(Rating rating) {
+    public void setRating(int rating) {
         this.rating = rating;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
     }
 }

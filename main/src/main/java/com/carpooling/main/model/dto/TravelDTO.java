@@ -1,4 +1,4 @@
-package com.carpooling.main.dto;
+package com.carpooling.main.model.dto;
 
 import java.time.LocalDateTime;
 

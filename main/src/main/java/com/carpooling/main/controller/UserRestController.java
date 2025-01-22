@@ -1,49 +1,62 @@
 package com.carpooling.main.controller;
 
+import com.carpooling.main.exceptions.EntityNotFoundException;
+import com.carpooling.main.exceptions.EntityDuplicateException;
+import com.carpooling.main.helpers.AuthenticationHelper;
 import com.carpooling.main.model.User;
 import com.carpooling.main.service.interfaces.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/users")
 public class UserRestController {
 
     private final UserService userService;
+    private final AuthenticationHelper authenticationHelper;
+
 
     @Autowired
-    public UserRestController(UserService userService) {
+    public UserRestController(UserService userService, AuthenticationHelper authenticationHelper) {
         this.userService = userService;
+        this.authenticationHelper = authenticationHelper;
+
+
     }
 
-    @GetMapping("/{username}")
-    public ResponseEntity<User> getUserByUsername(@PathVariable String username) {
+    @GetMapping("/{id}")
+    public User getById(@PathVariable int id) {
         try {
-            User user = userService.getUserByUsername(username);
-            return ResponseEntity.ok(user);
-        } catch (RuntimeException ex) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            return userService.getById(id);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         }
-    }
-
-    @GetMapping("/email/{email}")
-    public ResponseEntity<User> getUserByEmail(@PathVariable String email) {
-        Optional<User> userOptional = Optional.ofNullable(userService.getUserByEmail(email));
-        return userOptional.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
     @PostMapping
-    public ResponseEntity<User> saveUser(@RequestBody User user) {
+    public User create(@Valid @RequestBody User user) {
         try {
-            User savedUser = userService.saveUser(user);
-            return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
-        } catch (IllegalArgumentException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            userService.create(user);
+            return user;
+        } catch (EntityDuplicateException e) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
         }
     }
+
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable int id, @RequestHeader HttpHeaders headers) {
+        try {
+            User user = authenticationHelper.tryGetUser(headers);
+            userService.delete(id, user);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        }
+    }
+
 }
+

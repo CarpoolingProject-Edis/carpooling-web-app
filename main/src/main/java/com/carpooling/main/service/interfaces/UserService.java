@@ -1,14 +1,21 @@
 package com.carpooling.main.service.interfaces;
 
+
 import com.carpooling.main.model.User;
 
 public interface UserService {
 
-    User getUserByUsername(String username);
+    User getById(int id);
 
-    User saveUser(User user);
+    User getByEmail(String email);
 
-    User getUserByEmail(String email);
+    User getByUsername(String username);
 
-    boolean existsByUsername(String username);
+    void create(User user);
+
+    void update(User user, User loggedInUser, int id);
+
+    void delete(int id, User user);
+
+
 }

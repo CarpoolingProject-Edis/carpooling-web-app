@@ -2,16 +2,20 @@ package com.carpooling.main.repository;
 
 
 import com.carpooling.main.model.User;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+public interface UserRepository {
 
-@Repository
-public interface UserRepository extends JpaRepository<User, Long> {
+    User getById(int id);
 
-    Optional<User> findByUsername(String username);
+    User getByUsername(String username);
 
-    Optional<User> findByEmail(String email);
+    User getByEmail(String email);
+
+    void create(User user);
+
+    void update(User user);
+
+    void delete(int id);
 
 }
+

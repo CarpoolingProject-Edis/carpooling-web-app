@@ -1,4 +1,4 @@
-package com.carpooling.main.enums;
+package com.carpooling.main.model.enums;
 
 public enum Rating {
     ONE,

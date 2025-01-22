@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface TravelRepository extends JpaRepository<Travel, Integer> {
-    List<Travel> findByOrganizer(User organizer);
+public interface TravelRepository {
+
 }

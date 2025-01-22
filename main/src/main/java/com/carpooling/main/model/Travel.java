@@ -1,11 +1,14 @@
 package com.carpooling.main.model;
 
+
+import com.carpooling.main.model.enums.TravelStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "travels")
@@ -13,66 +16,86 @@ public class Travel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer travelId;
+    @Column(name = "id")
+    private int id;
 
-    @ManyToOne
-    @JoinColumn(name = "OrganizerID", nullable = false)
-    private User organizer;
-
-    @Column(nullable = false, length = 100)
+    @Column(name = "startPoint")
     private String startPoint;
 
-    @Column(nullable = false, length = 100)
+    @Column(name = "endPoint")
     private String endPoint;
 
-    @Column(nullable = false)
+    @Column(name = "departure_time")
     private LocalDateTime departureTime;
 
-    @Column(nullable = false)
-    private Integer freeSpots;
+    @Column(name = "free_spots")
+    private int freeSpots;
 
-    private String comments;
+    @ManyToOne
+    @JoinColumn(name = "driver_id")
+    private User driver;
 
-    @Column(nullable = false)
-    private boolean isCompleted = false;
+    @JsonIgnore
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_applications",
+            joinColumns = @JoinColumn(name = "travel_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private Set<TravelRequest> requests = new HashSet<>();
 
-    @Column(nullable = false, updatable = false)
-    @CreationTimestamp
-    private LocalDateTime createdAt;
+    @JsonIgnore
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "travels_passengers",
+            joinColumns = @JoinColumn(name = "travel_id"),
+            inverseJoinColumns = @JoinColumn(name = "passenger_id")
+    )
+    private Set<User> passengers = new HashSet<>();
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private TravelStatus travelStatus;
+
+    @Column(name = "duration")
+    private String duration;
+    @Column(name = "arrival_time")
+    private LocalDateTime arrivalTime;
+
 
     public Travel() {
     }
 
-    public Integer getTravelId() {
-        return travelId;
+    public int getId() {
+        return id;
     }
 
-    public void setTravelId(Integer travelId) {
-        this.travelId = travelId;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public User getOrganizer() {
-        return organizer;
-    }
-
-    public void setOrganizer(User organizer) {
-        this.organizer = organizer;
-    }
-
-    public String getStartPoint() {
+    public String getStartingPoint() {
         return startPoint;
     }
 
-    public void setStartPoint(String startPoint) {
-        this.startPoint = startPoint;
+    public void setStartingPoint(String startingPoint) {
+        this.startPoint = startingPoint;
     }
 
-    public String getEndPoint() {
+    public String getDestination() {
         return endPoint;
     }
 
-    public void setEndPoint(String endPoint) {
-        this.endPoint = endPoint;
+    public void setDestination(String destination) {
+        this.endPoint = destination;
+    }
+
+    public String getDuration() {
+        return duration;
+    }
+
+    public void setDuration(String duration) {
+        this.duration = duration;
     }
 
     public LocalDateTime getDepartureTime() {
@@ -83,35 +106,73 @@ public class Travel {
         this.departureTime = departureTime;
     }
 
-    public Integer getFreeSpots() {
+    public int getFreeSpots() {
         return freeSpots;
     }
 
-    public void setFreeSpots(Integer freeSpots) {
+    public void setFreeSpots(int freeSpots) {
         this.freeSpots = freeSpots;
     }
 
-    public String getComments() {
-        return comments;
+
+    public User getDriver() {
+        return driver;
     }
 
-    public void setComments(String comments) {
-        this.comments = comments;
+    public void setDriver(User driver) {
+        this.driver = driver;
     }
 
-    public boolean isCompleted() {
-        return isCompleted;
+    public TravelStatus getTravelStatus() {
+        return travelStatus;
     }
 
-    public void setCompleted(boolean completed) {
-        isCompleted = completed;
+    public void setTravelStatus(TravelStatus travelStatus) {
+        this.travelStatus = travelStatus;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
+    public Set<TravelRequest> getRequests() {
+        return requests;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
+    public void setRequests(Set<TravelRequest> requests) {
+        this.requests = requests;
+    }
+
+    public Set<User> getPassengers() {
+        return passengers;
+    }
+
+    public void setPassengers(Set<User> passengers) {
+        this.passengers = passengers;
+    }
+
+    public void addPassenger(User user) {
+        passengers.add(user);
+    }
+
+    public void removePassenger(User user) {
+        passengers.remove(user);
+    }
+
+    public LocalDateTime getArrivalTime() {
+        return arrivalTime;
+    }
+
+    public void setArrivalTime(LocalDateTime arrivalTime) {
+        this.arrivalTime = arrivalTime;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Travel travel = (Travel) o;
+        return id == travel.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

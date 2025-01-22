@@ -1,6 +1,6 @@
-package com.carpooling.main.dto;
+package com.carpooling.main.model.dto;
 
-import com.carpooling.main.enums.Rating;
+import com.carpooling.main.model.enums.Rating;
 
 import java.time.LocalDateTime;
 
