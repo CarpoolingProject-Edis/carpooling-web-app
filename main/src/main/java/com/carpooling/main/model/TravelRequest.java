@@ -27,6 +27,7 @@ public class TravelRequest {
     @Column(name = "status")
     private ApplicationStatus applicationStatus;
 
+
     public TravelRequest() {
     }
 

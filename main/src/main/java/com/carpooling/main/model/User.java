@@ -1,6 +1,5 @@
 package com.carpooling.main.model;
 
-
 import com.carpooling.main.model.enums.UserRole;
 import com.carpooling.main.model.enums.UserStatus;
 import jakarta.persistence.*;
@@ -16,19 +15,19 @@ public class User {
     @Column(name = "id")
     private int id;
 
-    @Column(name = "FirstName")
+    @Column(name = "firstName")
     private String firstName;
 
-    @Column(name = "LastName")
+    @Column(name = "lastName")
     private String lastName;
 
-    @Column(name = "Email")
+    @Column(name = "email")
     private String email;
 
-    @Column(name = "Username")
+    @Column(name = "username")
     private String username;
 
-    @Column(name = "Password")
+    @Column(name = "password")
     private String password;
 
     @Column(name = "phoneNumber")
@@ -41,6 +40,9 @@ public class User {
     @OneToOne
     @JoinColumn(name = "photo_url_id")
     private Photo photoUrl;
+
+    @Column(name = "rating")
+    private double rating;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role")
@@ -59,9 +61,12 @@ public class User {
                 String username,
                 String password,
                 String email,
+                String phoneNumber,
+                Car car,
+                double rating,
                 UserRole userRole,
                 UserStatus userStatus
-               ) {
+                ) {
 
         this.id = id;
         this.firstName = firstName;
@@ -70,9 +75,10 @@ public class User {
         this.password = password;
         this.email = email;
         this.phoneNumber = phoneNumber;
+        this.car = car;
+        this.rating = rating;
         this.userRole = userRole;
         this.userStatus = userStatus;
-
     }
 
     public int getId() {
@@ -131,12 +137,44 @@ public class User {
         this.phoneNumber = phoneNumber;
     }
 
+    public Car getCar() {
+        return car;
+    }
+
+    public void setCar(Car car) {
+        this.car = car;
+    }
+
+    public Photo getPhotoUrl() {
+        return photoUrl;
+    }
+
+    public void setPhotoUrl(Photo photoUrl) {
+        this.photoUrl = photoUrl;
+    }
+
+    public double getRating() {
+        return rating;
+    }
+
+    public void setRating(double rating) {
+        this.rating = rating;
+    }
+
     public UserRole getUserRole() {
         return userRole;
     }
 
     public void setUserRole(UserRole userRole) {
         this.userRole = userRole;
+    }
+
+    public UserStatus getUserStatus() {
+        return userStatus;
+    }
+
+    public void setUserStatus(UserStatus userStatus) {
+        this.userStatus = userStatus;
     }
 
     @Override

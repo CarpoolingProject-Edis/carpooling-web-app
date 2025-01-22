@@ -3,7 +3,7 @@ package com.carpooling.main.service;
 import com.carpooling.main.exceptions.EntityDuplicateException;
 import com.carpooling.main.exceptions.EntityNotFoundException;
 import com.carpooling.main.model.User;
-import com.carpooling.main.repository.UserRepository;
+import com.carpooling.main.repository.interfaces.UserRepository;
 import com.carpooling.main.service.interfaces.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

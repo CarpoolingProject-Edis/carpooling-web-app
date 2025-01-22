@@ -1,26 +1,33 @@
 package com.carpooling.main.service.interfaces;
 
 import com.carpooling.main.model.Feedback;
-import com.carpooling.main.model.Travel;
 import com.carpooling.main.model.User;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface FeedbackService {
 
-    List<Feedback> getAllFeedbacks();
+    Feedback getFeedbackById(int id);
 
-    Optional<Feedback> getFeedbackById(Integer id);
+    Feedback getFeedbackByGiverAndReceiver(User giver, User receiver);
 
-    List<Feedback> getFeedbacksByTravel(Travel travel);
+    boolean feedbackByGiverAndReceiverExists(User giver, User receiver);
 
-    List<Feedback> getFeedbacksFromUser(User fromUser);
+    List<Feedback> getFeedbacks();
 
-    List<Feedback> getFeedbacksToUser(User toUser);
+    List<Feedback> getFeedbacksByReceiver(User user);
 
-    Feedback createOrUpdateFeedback(Feedback feedback);
+    <T> List<T> getUniqueFeedbacks(User receiver);
 
-    void deleteFeedback(Integer id);
+    void calculateAverageRatingForUser(User user);
 
+    void updateRating(User user);
+
+    void create(Feedback feedback);
+
+    void deleteFeedback(User loggedInUser, User receiver);
+
+    void update(Feedback feedback);
+
+    void delete(Feedback feedback);
 }
