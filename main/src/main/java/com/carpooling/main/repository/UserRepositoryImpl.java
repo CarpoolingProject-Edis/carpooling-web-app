@@ -6,8 +6,11 @@ import com.carpooling.main.model.User;
 import com.carpooling.main.model.enums.UserRole;
 import com.carpooling.main.model.enums.UserStatus;
 import com.carpooling.main.repository.interfaces.UserRepository;
+import jakarta.transaction.Transactional;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.StaleObjectStateException;
+import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -103,26 +106,28 @@ public class UserRepositoryImpl implements UserRepository {
             session.getTransaction().commit();
         }
     }
-
     @Override
     public void create(User user) {
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
             user.setUserRole(UserRole.USER);
             user.setUserStatus(UserStatus.ACTIVE);
-            session.persist(user);
+            session.save(user);
             session.getTransaction().commit();
         }
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void update(User user) {
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            session.merge(user);
+            session.update(user);
             session.getTransaction().commit();
         }
     }
+
+
 
     @Override
     public void delete(int id) {

@@ -1,6 +1,7 @@
 package com.carpooling.main.model;
 
 
+import com.carpooling.main.model.enums.VehicleType;
 import jakarta.persistence.*;
 
 @Entity
@@ -14,18 +15,21 @@ public class Car {
 
     @Column(name = "model")
     private String model;
-
     @Column(name = "year")
     private int year;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "vehicle_type")
+    private VehicleType type;
 
     public Car() {
     }
 
-    public Car(int id, String model, int year) {
+    public Car(int id, String model, int year, VehicleType type) {
         this.id = id;
         this.model = model;
         this.year = year;
-
+        this.type = type;
     }
 
     public int getYear() {
@@ -52,4 +56,11 @@ public class Car {
         this.model = model;
     }
 
+    public VehicleType getType() {
+        return type;
+    }
+
+    public void setType(VehicleType type) {
+        this.type = type;
+    }
 }

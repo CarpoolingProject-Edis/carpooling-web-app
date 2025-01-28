@@ -33,16 +33,16 @@ public class User {
     @Column(name = "phoneNumber")
     private String phoneNumber;
 
-    @ManyToOne
-    @JoinColumn(name = "car_id")
+    @ManyToOne( fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Car car;
+
 
     @OneToOne
     @JoinColumn(name = "photo_url_id")
     private Photo photoUrl;
 
     @Column(name = "rating")
-    private double rating;
+    private Double rating;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role")
@@ -51,6 +51,7 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private UserStatus userStatus;
+
 
     public User() {
     }

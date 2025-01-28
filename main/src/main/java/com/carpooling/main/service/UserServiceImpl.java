@@ -12,6 +12,7 @@ import com.carpooling.main.repository.interfaces.UserRepository;
 import com.carpooling.main.service.interfaces.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 
