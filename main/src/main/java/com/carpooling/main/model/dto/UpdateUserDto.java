@@ -18,27 +18,9 @@ public class UpdateUserDto {
     @NotEmpty(message = "Field cannot be empty!")
     @Size(min = 10, max = 10, message = "Phone number must be 10 digits!")
     private String phoneNumber;
-    private String drivingExperience;
-    private int age;
-    private String nationality;
+
 
     public UpdateUserDto() {
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    public String getNationality() {
-        return nationality;
-    }
-
-    public void setNationality(String nationality) {
-        this.nationality = nationality;
     }
 
     public String getFirstName() {
@@ -63,14 +45,6 @@ public class UpdateUserDto {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getDrivingExperience() {
-        return drivingExperience;
-    }
-
-    public void setDrivingExperience(String drivingExperience) {
-        this.drivingExperience = drivingExperience;
     }
 
     public String getUsername() {

@@ -13,6 +13,7 @@ import com.carpooling.main.model.enums.TravelStatus;
 import com.carpooling.main.repository.interfaces.TravelRepository;
 import com.carpooling.main.service.interfaces.TravelRequestService;
 import com.carpooling.main.service.interfaces.TravelService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +31,7 @@ public class TravelServiceImpl implements TravelService {
         this.travelRepository = travelRepository;
         this.travelRequestService = travelRequestService;
     }
-
+    @Transactional
     @Override
     public Travel getTravelById(int id) {
         return travelRepository.getTravelById(id);

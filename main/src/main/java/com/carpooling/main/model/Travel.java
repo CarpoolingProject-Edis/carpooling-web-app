@@ -31,7 +31,7 @@ public class Travel {
     @Column(name = "free_spots")
     private int freeSpots;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "driver_id")
     private User driver;
 
@@ -56,12 +56,12 @@ public class Travel {
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private TravelStatus travelStatus;
-
+    @Column(name = "distance")
+    private String distance;
     @Column(name = "duration")
     private String duration;
     @Column(name = "arrival_time")
     private LocalDateTime arrivalTime;
-
 
     public Travel() {
     }
@@ -74,28 +74,20 @@ public class Travel {
         this.id = id;
     }
 
-    public String getStartingPoint() {
+    public String getStartPoint() {
         return startPoint;
     }
 
-    public void setStartingPoint(String startingPoint) {
-        this.startPoint = startingPoint;
+    public void setStartPoint(String startPoint) {
+        this.startPoint = startPoint;
     }
 
-    public String getDestination() {
+    public String getEndPoint() {
         return endPoint;
     }
 
-    public void setDestination(String destination) {
-        this.endPoint = destination;
-    }
-
-    public String getDuration() {
-        return duration;
-    }
-
-    public void setDuration(String duration) {
-        this.duration = duration;
+    public void setEndPoint(String endPoint) {
+        this.endPoint = endPoint;
     }
 
     public LocalDateTime getDepartureTime() {
@@ -114,21 +106,12 @@ public class Travel {
         this.freeSpots = freeSpots;
     }
 
-
     public User getDriver() {
         return driver;
     }
 
     public void setDriver(User driver) {
         this.driver = driver;
-    }
-
-    public TravelStatus getTravelStatus() {
-        return travelStatus;
-    }
-
-    public void setTravelStatus(TravelStatus travelStatus) {
-        this.travelStatus = travelStatus;
     }
 
     public Set<TravelRequest> getRequests() {
@@ -153,6 +136,29 @@ public class Travel {
 
     public void removePassenger(User user) {
         passengers.remove(user);
+    }
+    public TravelStatus getTravelStatus() {
+        return travelStatus;
+    }
+
+    public void setTravelStatus(TravelStatus travelStatus) {
+        this.travelStatus = travelStatus;
+    }
+
+    public String getDistance() {
+        return distance;
+    }
+
+    public void setDistance(String distance) {
+        this.distance = distance;
+    }
+
+    public String getDuration() {
+        return duration;
+    }
+
+    public void setDuration(String duration) {
+        this.duration = duration;
     }
 
     public LocalDateTime getArrivalTime() {

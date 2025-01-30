@@ -2,6 +2,7 @@ package com.carpooling.main.service.interfaces;
 
 import com.carpooling.main.model.Feedback;
 import com.carpooling.main.model.User;
+import com.carpooling.main.model.dto.UpdateFeedbackDto;
 
 import java.util.List;
 
@@ -24,6 +25,8 @@ public interface FeedbackService {
     void updateRating(User user);
 
     void create(Feedback feedback);
+
+    <T> T updateFeedbackGeneric(UpdateFeedbackDto updateFeedbackDto, User loggedInUser, User receiver);
 
     void deleteFeedback(User loggedInUser, User receiver);
 

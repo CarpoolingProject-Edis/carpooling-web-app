@@ -4,6 +4,7 @@ package com.carpooling.main.helpers.mapper;
 import com.carpooling.main.model.User;
 import com.carpooling.main.model.dto.RegisterDto;
 import com.carpooling.main.model.dto.UpdateUserDto;
+import com.carpooling.main.model.dto.UpdateUserPasswordDto;
 import com.carpooling.main.model.enums.UserRole;
 import com.carpooling.main.model.enums.UserStatus;
 import com.carpooling.main.repository.interfaces.CarRepository;
@@ -52,5 +53,15 @@ public class UserMapper {
         return user;
     }
 
+    public User fromDto(int id, UpdateUserPasswordDto dto) {
+        User user = userRepository.getById(id);
+        user.setPassword(dto.getChangePassword());
+        return user;
+    }
+    public UpdateUserPasswordDto toDto(User user) {
+        UpdateUserPasswordDto dto = new UpdateUserPasswordDto();
+        dto.setPassword(user.getPassword());
+        return dto;
+    }
 
 }

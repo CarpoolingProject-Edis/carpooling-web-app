@@ -2,6 +2,7 @@ package com.carpooling.main.model;
 
 import com.carpooling.main.model.enums.UserRole;
 import com.carpooling.main.model.enums.UserStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.Objects;
@@ -33,7 +34,9 @@ public class User {
     @Column(name = "phoneNumber")
     private String phoneNumber;
 
-    @ManyToOne( fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "car_id")
     private Car car;
 
 

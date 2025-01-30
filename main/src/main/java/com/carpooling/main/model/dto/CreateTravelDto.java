@@ -1,61 +1,43 @@
 package com.carpooling.main.model.dto;
 
 public class CreateTravelDto {
-    private String startingPoint;
-    private String destination;
-    private String departureTime;
-    private int freeSpots;
-    private String driverNote;
-    private float pricePerPerson;
+    private String startPoint;
+    private String endPoint;
+    private String departure_time;
+    private int free_spots;
 
     public CreateTravelDto() {
     }
 
-    public String getStartingPoint() {
-        return startingPoint;
+    public String getStartPoint() {
+        return startPoint;
     }
 
-    public void setStartingPoint(String startingPoint) {
-        this.startingPoint = startingPoint;
+    public void setStartPoint(String startPoint) {
+        this.startPoint = startPoint;
     }
 
-    public String getDestination() {
-        return destination;
+    public String getEndPoint() {
+        return endPoint;
     }
 
-    public void setDestination(String destination) {
-        this.destination = destination;
+    public void setEndPoint(String endPoint) {
+        this.endPoint = endPoint;
     }
 
-    public String getDepartureTime() {
-        return departureTime;
+    public String getDeparture_time() {
+        return departure_time;
     }
 
-    public void setDepartureTime(String departureTime) {
-        this.departureTime = departureTime;
+    public void setDeparture_time(String departure_time) {
+        this.departure_time = departure_time;
     }
 
-    public int getFreeSpots() {
-        return freeSpots;
+    public int getFree_spots() {
+        return free_spots;
     }
 
-    public void setFreeSpots(int freeSpots) {
-        this.freeSpots = freeSpots;
-    }
-
-    public String getDriverNote() {
-        return driverNote;
-    }
-
-    public void setDriverNote(String driverNote) {
-        this.driverNote = driverNote;
-    }
-
-    public float getPricePerPerson() {
-        return pricePerPerson;
-    }
-
-    public void setPricePerPerson(float pricePerPerson) {
-        this.pricePerPerson = pricePerPerson;
+    public void setFree_spots(int free_spots) {
+        this.free_spots = free_spots;
     }
 }

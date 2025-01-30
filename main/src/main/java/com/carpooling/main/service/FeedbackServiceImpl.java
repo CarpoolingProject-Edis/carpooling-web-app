@@ -6,6 +6,7 @@ import com.carpooling.main.exceptions.EntityNotFoundException;
 import com.carpooling.main.model.Feedback;
 import com.carpooling.main.model.FeedbackComment;
 import com.carpooling.main.model.User;
+import com.carpooling.main.model.dto.UpdateFeedbackDto;
 import com.carpooling.main.repository.interfaces.FeedbackRepository;
 import com.carpooling.main.repository.interfaces.UserRepository;
 import com.carpooling.main.service.interfaces.FeedbackCommentService;
@@ -102,6 +103,43 @@ public class FeedbackServiceImpl implements FeedbackService {
 
         feedbackRepository.create(feedback);
         calculateAverageRatingForUser(feedback.getReceivedBy());
+    }
+
+
+    @Override
+    public <T> T updateFeedbackGeneric(UpdateFeedbackDto updateFeedbackDTO, User loggedInUser, User receiver) {
+        Feedback foundFeedback = getFeedbackByGiverAndReceiver(loggedInUser, receiver);
+
+        if (updateFeedbackDTO.getRating().isPresent()) {
+            foundFeedback.setRating(updateFeedbackDTO.getRating().getAsInt());
+            update(foundFeedback);
+            updateRating(receiver);
+        }
+
+        FeedbackComment feedbackWithComment = feedbackCommentService.getCommentByFeedback(foundFeedback);
+        String commentFromDTO = updateFeedbackDTO.getComment();
+        if (feedbackWithComment != null) {
+            if (commentFromDTO != null) {
+                feedbackWithComment.setComment(commentFromDTO);
+                if (!(feedbackWithComment.getComment().isBlank())) {
+                    feedbackCommentService.update(feedbackWithComment);
+                    return (T) feedbackWithComment;
+                }
+            }
+            feedbackCommentService.delete(feedbackWithComment);
+        } else {
+            if (commentFromDTO != null) {
+                if (!commentFromDTO.isBlank()) {
+                    feedbackWithComment = new FeedbackComment();
+                    feedbackWithComment.setComment(commentFromDTO);
+                    feedbackWithComment.setFeedback(foundFeedback);
+                    feedbackCommentService.create(feedbackWithComment);
+                    return (T) feedbackWithComment;
+                }
+            }
+        }
+
+        return (T) foundFeedback;
     }
 
     @Override

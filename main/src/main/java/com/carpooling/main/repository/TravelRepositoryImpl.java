@@ -81,7 +81,7 @@ public class TravelRepositoryImpl implements TravelRepository {
     @Override
     public void create(Travel travel) {
         try (Session session = sessionFactory.openSession()) {
-            session.persist(travel);
+            session.save(travel);
         }
     }
 
@@ -89,7 +89,7 @@ public class TravelRepositoryImpl implements TravelRepository {
     public void updateArrivalTime(Travel travel) {
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            session.merge(travel);
+            session.update(travel);
             session.getTransaction().commit();
         }
     }
@@ -98,7 +98,7 @@ public class TravelRepositoryImpl implements TravelRepository {
     public void update(Travel travel) {
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            session.merge(travel);
+            session.update(travel);
             session.getTransaction().commit();
         }
     }
@@ -108,7 +108,7 @@ public class TravelRepositoryImpl implements TravelRepository {
         Travel travel = getTravelById(id);
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            session.remove(travel);
+            session.delete(travel);
             session.getTransaction().commit();
         }
     }
