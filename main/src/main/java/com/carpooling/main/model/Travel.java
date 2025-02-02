@@ -56,12 +56,6 @@ public class Travel {
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private TravelStatus travelStatus;
-    @Column(name = "distance")
-    private String distance;
-    @Column(name = "duration")
-    private String duration;
-    @Column(name = "arrival_time")
-    private LocalDateTime arrivalTime;
 
     public Travel() {
     }
@@ -145,29 +139,6 @@ public class Travel {
         this.travelStatus = travelStatus;
     }
 
-    public String getDistance() {
-        return distance;
-    }
-
-    public void setDistance(String distance) {
-        this.distance = distance;
-    }
-
-    public String getDuration() {
-        return duration;
-    }
-
-    public void setDuration(String duration) {
-        this.duration = duration;
-    }
-
-    public LocalDateTime getArrivalTime() {
-        return arrivalTime;
-    }
-
-    public void setArrivalTime(LocalDateTime arrivalTime) {
-        this.arrivalTime = arrivalTime;
-    }
 
     @Override
     public boolean equals(Object o) {

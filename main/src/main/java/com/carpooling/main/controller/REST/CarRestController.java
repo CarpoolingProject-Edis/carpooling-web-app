@@ -1,4 +1,4 @@
-package com.carpooling.main.controller;
+package com.carpooling.main.controller.REST;
 
 import com.carpooling.main.exceptions.EntityDuplicateException;
 import com.carpooling.main.model.Car;

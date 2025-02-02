@@ -3,6 +3,7 @@ package com.carpooling.main.service;
 
 import com.carpooling.main.exceptions.AlreadyAppliedException;
 import com.carpooling.main.exceptions.TravelFinishedException;
+import com.carpooling.main.exceptions.YouAreTheDriverException;
 import com.carpooling.main.model.Travel;
 import com.carpooling.main.model.TravelRequest;
 import com.carpooling.main.model.User;
@@ -11,6 +12,7 @@ import com.carpooling.main.model.enums.TravelStatus;
 import com.carpooling.main.repository.interfaces.TravelRequestRepository;
 import com.carpooling.main.service.interfaces.TravelRequestService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -67,10 +69,14 @@ public class TravelRequestServiceImpl implements TravelRequestService {
         return travelRequestRepository.getAllByTravel(travel);
     }
 
+    @Transactional
     @Override
     public void create(TravelRequest travelRequest, User loggedInUser, Travel travel) {
         if (travel.getTravelStatus().equals(TravelStatus.FINISHED)) {
             throw new TravelFinishedException("This travel has already been concluded.");
+        }
+        if (travel.getDriver().getId() == loggedInUser.getId()) {
+            throw new YouAreTheDriverException("Are you dumb?");
         }
         if (travel.getPassengers().contains(loggedInUser)) {
             throw new AlreadyAppliedException("You have already applied for this travel.");

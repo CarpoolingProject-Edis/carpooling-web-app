@@ -108,7 +108,7 @@ public class TravelRequestRepositoryImpl implements TravelRequestRepository {
     @Override
     public void create(TravelRequest travelRequest) {
         try (Session session = sessionFactory.openSession()) {
-            session.persist(travelRequest);
+            session.save(travelRequest);
         }
     }
 
@@ -116,7 +116,7 @@ public class TravelRequestRepositoryImpl implements TravelRequestRepository {
     public void update(TravelRequest travelRequest) {
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            session.merge(travelRequest);
+            session.update(travelRequest);
             session.getTransaction().commit();
         }
     }
@@ -125,7 +125,7 @@ public class TravelRequestRepositoryImpl implements TravelRequestRepository {
     public void delete(TravelRequest travelRequest) {
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            session.remove(travelRequest);
+            session.delete(travelRequest);
             session.getTransaction().commit();
         }
     }

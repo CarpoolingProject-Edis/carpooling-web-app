@@ -57,14 +57,6 @@ public class TravelServiceImpl implements TravelService {
         return travelRepository.getTravelsByDriver(user);
     }
 
-    @Override
-    public List<Travel> getOngoingUserTravels(User user, Travel travel) {
-        return getTravelsByUser(user)
-                .stream()
-                .filter(existingTravel -> !(existingTravel.getDepartureTime().isAfter(travel.getArrivalTime())
-                        || existingTravel.getArrivalTime().isBefore(travel.getDepartureTime())))
-                .collect(Collectors.toList());
-    }
 
     @Override
     public void create(Travel travel) {

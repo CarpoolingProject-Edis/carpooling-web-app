@@ -96,7 +96,7 @@ public class FeedbackRepositoryImpl implements FeedbackRepository {
     @Override
     public void create(Feedback feedback) {
         try (Session session = sessionFactory.openSession()) {
-            session.persist(feedback);
+            session.save(feedback);
         }
     }
 
@@ -104,7 +104,7 @@ public class FeedbackRepositoryImpl implements FeedbackRepository {
     public void update(Feedback feedback) {
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            session.merge(feedback);
+            session.update(feedback);
             session.getTransaction().commit();
         }
     }
@@ -113,8 +113,8 @@ public class FeedbackRepositoryImpl implements FeedbackRepository {
     public void delete(Feedback feedback) {
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            session.remove(feedback);
+            session.delete(feedback);
             session.getTransaction().commit();
         }
-    }
+}
 }

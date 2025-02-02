@@ -18,7 +18,7 @@ public interface TravelService {
 
     List<Travel> getTravelsByDriver(User user);
 
-    List<Travel> getOngoingUserTravels(User user, Travel travel);
+  //  List<Travel> getOngoingUserTravels(User user, Travel travel);
 
     void create(Travel travel);
 

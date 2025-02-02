@@ -1,4 +1,4 @@
-package com.carpooling.main.controller;
+package com.carpooling.main.controller.REST;
 
 
 import com.carpooling.main.exceptions.EntityDuplicateException;
@@ -12,7 +12,6 @@ import com.carpooling.main.model.Car;
 import com.carpooling.main.model.TravelRequest;
 import com.carpooling.main.model.User;
 import com.carpooling.main.model.dto.CarDto;
-import com.carpooling.main.model.dto.UpdateUserDto;
 import com.carpooling.main.model.dto.UpdateUserPasswordDto;
 import com.carpooling.main.model.enums.UserRole;
 import com.carpooling.main.service.interfaces.*;
