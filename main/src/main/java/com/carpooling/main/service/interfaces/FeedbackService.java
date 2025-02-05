@@ -33,4 +33,6 @@ public interface FeedbackService {
     void update(Feedback feedback);
 
     void delete(Feedback feedback);
+
+    void updateFeedback(UpdateFeedbackDto updateFeedbackDTO, User loggedInUser, User receiver);
 }

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body><header class="header">
+    <div class="header-content">
+        <!-- Left Side: Search Bar -->
+        <div class="header-search">
+            <input type="text" placeholder="Search...">
+        </div>
+
+        <!-- Right Side: Login/Register or Logout Links -->
+        <div class="header-links">
+            <!-- Check if user is logged in -->
+            <th:block th:if="${logUser != null}">
+                <!-- If logged in, show Logout -->
+                <a href="/auth/logout">Logout</a>
+            </th:block>
+
+            <th:block th:if="${logUser == null}">
+                <!-- If not logged in, show Login/Register -->
+                <a href="/auth/login">Login</a> | <a href="/auth/register">Register</a>
+            </th:block>
+        </div>
+    </div>
+</header>
+
+<!-- Main Content -->
+<div class="container">
+    <!-- Left Side (Available Travels) -->
+    <div class="left-side">
+        <h2>Available Travels</h2>
+        <ul>
+            <!-- Placeholder for travels list -->
+            <li>Travel 1</li>
+            <li>Travel 2</li>
+            <li>Travel 3</li>
+        </ul>
+    </div>
+
+    <!-- Right Side (Top 10 Drivers and Passengers) -->
+    <div class="right-side">
+        <h2>Top 10 Drivers</h2>
+        <ul>
+            <th:block th:each="user : ${top10UsersDriver}">
+                <li th:text="${user.firstName + ' ' + user.lastName + ' - Rating: ' + user.rating}"></li>
+            </th:block>
+        </ul>
+
+        <h2>Top 10 Passengers</h2>
+        <ul>
+            <th:block th:each="user : ${top10UsersPassenger}">
+                <li th:text="${user.firstName + ' ' + user.lastName + ' - Rating: ' + user.rating}"></li>
+            </th:block>
+        </ul>
+    </div>
+</div>
+
+
+</body>
+</html>

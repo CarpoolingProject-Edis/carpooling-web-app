@@ -160,6 +160,38 @@ public class FeedbackServiceImpl implements FeedbackService {
     }
 
     @Override
+    public void updateFeedback(UpdateFeedbackDto updateFeedbackDTO, User loggedInUser, User receiver) {
+        Feedback foundFeedback = getFeedbackByGiverAndReceiver(loggedInUser, receiver);
+        if (updateFeedbackDTO.getRating().isPresent()) {
+            foundFeedback.setRating(updateFeedbackDTO.getRating().getAsInt());
+            update(foundFeedback);
+            updateRating(receiver);
+        }
+
+        FeedbackComment feedbackWithComment = feedbackCommentService.getCommentByFeedback(foundFeedback);
+        String commentFromDTO = updateFeedbackDTO.getComment();
+        if (feedbackWithComment != null) {
+            if (commentFromDTO != null && !commentFromDTO.isBlank()) {
+                feedbackWithComment.setComment(commentFromDTO);
+                if (!(feedbackWithComment.getComment().isBlank())) {
+                    feedbackCommentService.update(feedbackWithComment);
+                }
+            } else {
+                feedbackCommentService.delete(feedbackWithComment);
+            }
+        } else {
+            if (commentFromDTO != null) {
+                if (!commentFromDTO.isBlank()) {
+                    feedbackWithComment = new FeedbackComment();
+                    feedbackWithComment.setComment(commentFromDTO);
+                    feedbackWithComment.setFeedback(foundFeedback);
+                    feedbackCommentService.create(feedbackWithComment);
+                }
+            }
+        }
+    }
+
+    @Override
     public void calculateAverageRatingForUser(User user) {
         List<Feedback> userFeedbacks = getFeedbacksByReceiver(user);
         if (userFeedbacks == null) {

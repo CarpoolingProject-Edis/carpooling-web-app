@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Travel Details</title>
+</head>
+<body>
+
+<!-- Check for any error message -->
+<div th:if="${error}">
+    <h3 th:text="${error}"></h3>
+</div>
+
+<!-- Display travel details -->
+<div th:if="${travel}">
+    <h1>Travel Details</h1>
+
+    <div>
+        <h3>Start Point:</h3>
+        <p th:text="${travel.startPoint}"></p> <!-- Start point of the travel -->
+    </div>
+
+    <div>
+        <h3>End Point:</h3>
+        <p th:text="${travel.endPoint}"></p> <!-- End point of the travel -->
+    </div>
+
+<!--    <div>-->
+<!--        <h3>Departure Time:</h3>-->
+<!--        <p th:text="${#dates.format(travel.departureTime, 'yyyy-MM-dd HH:mm')}"></p> &lt;!&ndash; Formatted departure time &ndash;&gt;-->
+<!--    </div>-->
+
+    <div>
+        <h3>Free Spots:</h3>
+        <p th:text="${travel.freeSpots}"></p> <!-- Number of free spots -->
+    </div>
+
+    <div>
+        <h3>Driver:</h3>
+        <p>
+            <!-- Check if driver is available, then display their first name, last name, or username -->
+            <span th:text="${travel.driver.firstName} + ' ' + ${travel.driver.lastName}"></span>
+            <!-- Fallback to username if first and last names are not present -->
+            <span th:if="${travel.driver.firstName == null or travel.driver.lastName == null}" th:text="${travel.driver.username}"></span>
+        </p> <!-- Display driver's name (or username if the name is not available) -->
+    </div>
+
+    <div>
+        <h3>Travel Status:</h3>
+        <p th:text="${travel.travelStatus}"></p> <!-- Travel status, assuming it's an enum -->
+    </div>
+
+    <!-- Optional: Show passengers -->
+    <div>
+        <h3>Passengers:</h3>
+        <ul>
+            <li th:each="passenger : ${travel.passengers}" th:text="${passenger.firstName} + ' ' + ${passenger.lastName}"></li> <!-- Displaying each passenger's name -->
+        </ul>
+    </div>
+
+    <!-- Optional: Show requests -->
+    <div>
+        <h3>Requests:</h3>
+        <ul>
+            <li th:each="request : ${travel.requests}" th:text="${request.status}"></li> <!-- Displaying each request's status -->
+        </ul>
+    </div>
+
+    <!-- Optional: Add buttons for navigation or actions -->
+    <a th:href="@{/}" class="btn">Back to List</a> <!-- Link to navigate back to list -->
+
+</div>
+
+</body>
+</html>
