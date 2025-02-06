@@ -4,61 +4,89 @@
     <meta charset="UTF-8">
     <title>Home</title>
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
-<body><header class="header">
-    <div class="header-content">
-        <!-- Left Side: Search Bar -->
-        <div class="header-search">
-            <input type="text" placeholder="Search...">
+<body>
+<div class="overlay">
+    <header class="header fixed-top">
+        <div class="header-content">
+            <!-- Left Side: Search Bar -->
+            <div class="header-search">
+                <input type="text" placeholder="Search...">
+            </div>
+
+            <!-- Right Side: Profile Dropdown or Login/Register -->
+            <div class="header-links">
+                <th:block th:if="${logUser != null}">
+                    <!-- Profile Dropdown -->
+                    <div class="dropdown">
+                        <button class="dropdown-toggle profile-btn btn btn-secondary" type="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-circle"></i> Profile
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="profileDropdown">
+                            <li><a class="dropdown-item" href="/profile/edit">Edit Profile</a></li>
+                            <li><a class="dropdown-item" href="/auth/logout">Logout</a></li>
+                        </ul>
+                    </div>
+                </th:block>
+
+                <th:block th:if="${logUser == null}">
+                    <a href="/auth/login" class="btn btn-primary">Login</a>
+                    <a href="/auth/register" class="btn btn-success">Register</a>
+                </th:block>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container" style="margin-top: 80px;">
+        <!-- Left Side (Available Travels) -->
+        <div class="left-side">
+            <h2>Available Travels</h2>
+
+            <!-- Filter Buttons -->
+            <div class="btn-group mb-3">
+                <a href="/home" class="btn btn-outline-primary">All</a>
+                <a href="/home?filter=start" class="btn btn-outline-secondary">Sort by Start Location</a>
+                <a href="/home?filter=end" class="btn btn-outline-info">Sort by Destination</a>
+                <a href="/home?filter=time" class="btn btn-outline-warning">Sort by Departure Time</a>
+            </div>
+
+            <!-- Travel List -->
+            <ul>
+                <th:block th:each="travel : ${availableTravels}">
+                    <li th:text="${travel.startPoint + ' to ' + travel.endPoint + ' - ' + travel.departureTime}"></li>
+                </th:block>
+            </ul>
         </div>
 
-        <!-- Right Side: Login/Register or Logout Links -->
-        <div class="header-links">
-            <!-- Check if user is logged in -->
-            <th:block th:if="${logUser != null}">
-                <!-- If logged in, show Logout -->
-                <a href="/auth/logout">Logout</a>
-            </th:block>
+        <!-- Right Side (Top 10 Drivers and Passengers) -->
+        <div class="right-side">
+            <h2>Top 10 Drivers</h2>
+            <ul>
+                <th:block th:each="user : ${top10UsersDriver}">
+                    <li th:text="${user.firstName + ' ' + user.lastName + ' - Rating: ' + user.rating}"></li>
+                </th:block>
+            </ul>
 
-            <th:block th:if="${logUser == null}">
-                <!-- If not logged in, show Login/Register -->
-                <a href="/auth/login">Login</a> | <a href="/auth/register">Register</a>
-            </th:block>
+            <h2>Top 10 Passengers</h2>
+            <ul>
+                <th:block th:each="user : ${top10UsersPassenger}">
+                    <li th:text="${user.firstName + ' ' + user.lastName + ' - Rating: ' + user.rating}"></li>
+                </th:block>
+            </ul>
         </div>
-    </div>
-</header>
-
-<!-- Main Content -->
-<div class="container">
-    <!-- Left Side (Available Travels) -->
-    <div class="left-side">
-        <h2>Available Travels</h2>
-        <ul>
-            <!-- Placeholder for travels list -->
-            <li>Travel 1</li>
-            <li>Travel 2</li>
-            <li>Travel 3</li>
-        </ul>
-    </div>
-
-    <!-- Right Side (Top 10 Drivers and Passengers) -->
-    <div class="right-side">
-        <h2>Top 10 Drivers</h2>
-        <ul>
-            <th:block th:each="user : ${top10UsersDriver}">
-                <li th:text="${user.firstName + ' ' + user.lastName + ' - Rating: ' + user.rating}"></li>
-            </th:block>
-        </ul>
-
-        <h2>Top 10 Passengers</h2>
-        <ul>
-            <th:block th:each="user : ${top10UsersPassenger}">
-                <li th:text="${user.firstName + ' ' + user.lastName + ' - Rating: ' + user.rating}"></li>
-            </th:block>
-        </ul>
     </div>
 </div>
 
+<!-- Footer -->
+<footer class="footer bg-light text-center mt-5 py-3">
+    <p>&copy; 2024 Carpooling Service | <a href="/home/about" class="text-dark">About</a></p>
+</footer>
+
+<!-- Bootstrap JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>

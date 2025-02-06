@@ -36,6 +36,14 @@ public class TravelServiceImpl implements TravelService {
     public Travel getTravelById(int id) {
         return travelRepository.getTravelById(id);
     }
+    @Override
+    public List<Travel> getAllAvailableTravels() {
+        return travelRepository.getAllTravels().stream()
+                .filter(travel -> travel.getTravelStatus() == TravelStatus.OPEN)
+                .toList();
+    }
+
+
 
     @Override
     public List<Travel> getTravelsByStartingLocation(String location) {

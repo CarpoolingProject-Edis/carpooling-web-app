@@ -10,6 +10,8 @@ public interface TravelService {
 
     Travel getTravelById(int id);
 
+    List<Travel> getAllAvailableTravels();
+
     List<Travel> getTravelsByStartingLocation(String location);
 
     List<Travel> getTravelsByDestination(String location);
