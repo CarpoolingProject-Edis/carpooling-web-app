@@ -55,14 +55,22 @@ public class TravelRequestServiceImpl implements TravelRequestService {
     public List<TravelRequest> getTravelRequestsByDriver(User user) {
         return travelRequestRepository.getTravelRequestsByDriver(user);
     }
-
     @Override
     public List<TravelRequest> getTravelRequestsByPopulate(User receiver, int travelId) {
-        return getTravelRequestsByPassenger(receiver)
-                .stream()
-                .filter(request -> request.getTravel().getId() == travelId)
-                .collect(Collectors.toList());
+
+        Travel travel = travelRepository.getTravelById(travelId);
+
+        if (travel.getDriver().getId() == receiver.getId()) {
+
+            return travelRequestRepository.getAllByTravel(travel);
+        } else {
+            return getTravelRequestsByPassenger(receiver)
+                    .stream()
+                    .filter(request -> request.getTravel().getId() == travelId)
+                    .collect(Collectors.toList());
+        }
     }
+
 
     @Override
     public List<TravelRequest> getAllRequestsForTravel(Travel travel) {

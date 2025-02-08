@@ -66,17 +66,21 @@ public class TravelMVCController {
         try {
             User loggedUser = authenticationHelper.tryGetUser(session);
             Travel singleTravel = travelService.getTravelById(id);
+
+            // Use the updated service method that returns requests only if the logged user is the driver.
             List<TravelRequest> requestsByPopulate = travelRequestService.getTravelRequestsByPopulate(loggedUser, id);
             boolean hasApplied = !requestsByPopulate.isEmpty();
             boolean isDriver = loggedUser.getId() == singleTravel.getDriver().getId();
             boolean isPartOfTravel = singleTravel.getPassengers().contains(loggedUser);
             boolean isCancelled = singleTravel.getTravelStatus().equals(TravelStatus.CANCELLED);
+
             model.addAttribute("isCancelled", isCancelled);
             model.addAttribute("isPartOfTravel", isPartOfTravel);
             model.addAttribute("isDriver", isDriver);
             model.addAttribute("hasApplied", hasApplied);
             model.addAttribute("travel", singleTravel);
             model.addAttribute("logUser", loggedUser);
+            model.addAttribute("requests", requestsByPopulate);
             return "SingleTravelView";
         } catch (AuthenticationFailedException e) {
             return "redirect:/auth/login";

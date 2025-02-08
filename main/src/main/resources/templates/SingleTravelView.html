@@ -4,10 +4,13 @@
     <meta charset="UTF-8">
     <title>Travel Details</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body class="bg-light">
 <div class="container mt-5 p-4 bg-white rounded shadow">
+
+    <!-- Display error if present -->
     <div th:if="${error}" class="alert alert-danger">
         <h3 th:text="${error}"></h3>
     </div>
@@ -15,6 +18,7 @@
     <div th:if="${travel}">
         <h1 class="mb-4">Travel Details</h1>
 
+        <!-- Travel Basic Details -->
         <div class="mb-3">
             <h3>Start Point:</h3>
             <p th:text="${travel.startPoint}" class="fw-light"></p>
@@ -34,7 +38,8 @@
             <h3>Driver:</h3>
             <p>
                 <span th:text="${travel.driver.firstName} + ' ' + ${travel.driver.lastName}" class="fw-light"></span>
-                <span th:if="${travel.driver.firstName == null or travel.driver.lastName == null}" th:text="${travel.driver.username}" class="fw-light"></span>
+                <span th:if="${travel.driver.firstName == null or travel.driver.lastName == null}"
+                      th:text="${travel.driver.username}" class="fw-light"></span>
             </p>
         </div>
 
@@ -52,32 +57,42 @@
             </ul>
         </div>
 
-<!--        &lt;!&ndash; Requests Section &ndash;&gt;-->
-<!--        <div class="mb-3">-->
-<!--            <h3>Requests:</h3>-->
-<!--            <ul class="list-group">-->
-<!--                <li th:each="request : ${travel.requests}" th:text="${request.status}" class="list-group-item"></li>-->
-<!--                <span th:text="${request.user.firstName} + ' ' + ${request.user.lastName}"></span>-->
-<!--                    <div>-->
-<!--                        <form th:action="@{/travels/{travelId}/approve(travelId=${travel.id}, userId=${request.user.id})}" method="post" class="d-inline">-->
-<!--                            <button type="submit" class="btn btn-success btn-sm"><i class="fas fa-check"></i></button>-->
-<!--                        </form>-->
-<!--                        <form th:action="@{/travels/{travelId}/reject(travelId=${travel.id}, userId=${request.user.id})}" method="post" class="d-inline">-->
-<!--                            <button type="submit" class="btn btn-danger btn-sm"><i class="fas fa-times"></i></button>-->
-<!--                        </form>-->
-<!--                    </div>-->
-<!--                </li>-->
-<!--            </ul>-->
-<!--        </div>-->
+        <!-- Requests Section (only visible to the driver) -->
+        <div class="mb-3" th:if="${isDriver}">
+            <h3>Requests:</h3>
+            <ul class="list-group">
+                <th:block th:each="request : ${requests}">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <!-- Display the application status using getApplicationStatus() -->
+                        <span th:text="${request.applicationStatus}"></span> -
+                        <span th:text="${request.passenger.firstName} + ' ' + ${request.passenger.lastName}"></span>
+                        <div>
+                            <!-- Accept Button -->
+                            <form th:action="@{/travels/{travelId}/requests/{requestId}/accept(travelId=${travel.id}, requestId=${request.id})}"
+                                  method="post" class="d-inline">
+                                <button type="submit" class="btn btn-success btn-sm">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                            </form>
+                            <!-- Reject Button -->
+                            <form th:action="@{/travels/{travelId}/requests/{requestId}/reject(travelId=${travel.id}, requestId=${request.id})}"
+                                  method="post" class="d-inline">
+                                <button type="submit" class="btn btn-danger btn-sm">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </li>
+                </th:block>
+            </ul>
+        </div>
 
-        <!-- Join Button Logic -->
-        <form th:if="${logUser != travel.driver
-                      and !(travel.passengers.contains(logUser)
-                      or travel.requests.contains(logUser))}"
-              th:action="@{/travels/{travelId}/apply(travelId=${travel.id})}"
-              method="post">
-            <button type="submit" class="btn btn-success">Join</button>
-        </form>
+        <!-- Join Button (only visible if not driver and not already applied) -->
+        <div class="mb-3" th:if="${!isDriver and !hasApplied}">
+            <form th:action="@{/travels/{travelId}/apply(travelId=${travel.id})}" method="post">
+                <button type="submit" class="btn btn-success">Join</button>
+            </form>
+        </div>
 
         <a th:href="@{/home}" class="btn btn-primary mt-3">Back to List</a>
     </div>
