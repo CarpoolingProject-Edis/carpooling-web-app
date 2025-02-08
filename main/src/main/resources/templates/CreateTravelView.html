@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Travel</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+    <h1>Create New Travel</h1>
+    <form th:action="@{/travels/new}" th:object="${travel}" method="post">
+        <div class="mb-3">
+            <label for="startingPoint" class="form-label">Starting Point</label>
+            <input type="text" th:field="*{startPoint}" class="form-control" id="startingPoint" placeholder="Enter starting point">
+        </div>
+        <div class="mb-3">
+            <label for="destination" class="form-label">Destination</label>
+            <input type="text" th:field="*{endPoint}" class="form-control" id="destination" placeholder="Enter destination">
+        </div>
+        <div class="mb-3">
+            <label for="departureTime" class="form-label">Departure Time</label>
+            <input type="datetime-local" th:field="*{departure_time}" class="form-control" id="departureTime">
+        </div>
+        <div class="mb-3">
+            <label for="free_spots" class="form-label">Free Spots</label>
+            <input type="number" th:field="*{free_spots}" class="form-control" id="free_spots" placeholder="Enter free spots">
+        </div>
+        <button type="submit" class="btn btn-primary">Create Travel</button>
+        <a th:href="@{/travels}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

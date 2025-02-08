@@ -4,8 +4,6 @@ import com.carpooling.main.exceptions.AuthenticationFailedException;
 import com.carpooling.main.helpers.AuthenticationHelper;
 import com.carpooling.main.model.Travel;
 import com.carpooling.main.model.User;
-import com.carpooling.main.model.enums.UserRole;
-import com.carpooling.main.model.enums.UserStatus;
 import com.carpooling.main.repository.interfaces.TravelRepository;
 import com.carpooling.main.service.interfaces.TravelService;
 import com.carpooling.main.service.interfaces.UserService;
@@ -29,6 +27,7 @@ public class HomeMVCController {
     private final AuthenticationHelper authenticationHelper;
     private final TravelService travelService;
     private final TravelRepository travelRepository;
+
     @Autowired
     public HomeMVCController(UserService userService, AuthenticationHelper authenticationHelper, TravelService travelService, TravelRepository travelRepository) {
         this.authenticationHelper = authenticationHelper;
@@ -52,6 +51,17 @@ public class HomeMVCController {
                         .collect(Collectors.toList());
                 case "time" -> availableTravels.stream()
                         .sorted(Comparator.comparing(Travel::getDepartureTime))
+                        .collect(Collectors.toList());
+                case "a-z" -> availableTravels.stream()
+                        .sorted(Comparator.comparing(Travel::getStartPoint)
+                                .thenComparing(Travel::getEndPoint)
+                                .thenComparing(Travel::getDepartureTime))
+                        .collect(Collectors.toList());
+                case "z-a" -> availableTravels.stream()
+                        .sorted(Comparator.comparing(Travel::getStartPoint)
+                                .thenComparing(Travel::getEndPoint)
+                                .thenComparing(Travel::getDepartureTime)
+                                .reversed())
                         .collect(Collectors.toList());
                 default -> availableTravels;
             };

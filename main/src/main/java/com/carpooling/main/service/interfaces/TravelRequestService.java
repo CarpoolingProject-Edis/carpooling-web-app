@@ -30,4 +30,8 @@ public interface TravelRequestService {
     void update(TravelRequest travelRequest);
 
     void delete(TravelRequest travelRequest);
+
+    void acceptRequest(User driver, int travelId, int requestId);
+    void rejectRequest(User driver, int travelId, int requestId);
+
 }

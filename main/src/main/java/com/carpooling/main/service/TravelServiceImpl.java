@@ -17,6 +17,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,6 +45,18 @@ public class TravelServiceImpl implements TravelService {
     }
 
 
+    @Override
+    public List<Travel> getOngoingUserTravels(User user, Travel travel) {
+        LocalDateTime travelArrivalTime = travel.getDepartureTime().plusHours(1);
+        return getTravelsByUser(user)
+                .stream()
+                .filter(existingTravel -> {
+                    LocalDateTime existingArrivalTime = existingTravel.getDepartureTime().plusHours(1);
+                    return !(existingTravel.getDepartureTime().isAfter(travelArrivalTime)
+                            || existingArrivalTime.isBefore(travel.getDepartureTime()));
+                })
+                .collect(Collectors.toList());
+    }
 
     @Override
     public List<Travel> getTravelsByStartingLocation(String location) {
