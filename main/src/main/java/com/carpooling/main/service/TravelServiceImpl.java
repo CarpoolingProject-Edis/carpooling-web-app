@@ -101,14 +101,14 @@ public class TravelServiceImpl implements TravelService {
     }
 
     @Override
-    public void delete(User loggedInUser, int id) {
-        checkAdminOrCreator(loggedInUser, id);
-        Travel travel = travelRepository.getTravelById(id);
-        List<TravelRequest> travelRequests = travelRequestService.getAllRequestsForTravel(travel);
-        for (TravelRequest travelRequest : travelRequests) {
-            travelRequestService.delete(travelRequest);
-        }
+    public void delete(int id) {
         travelRepository.delete(id);
+    }
+
+    @Override
+    public void markAsFinished(Travel travel) {
+        travel.setTravelStatus(TravelStatus.FINISHED);
+        travelRepository.create(travel);
     }
 
     @Override

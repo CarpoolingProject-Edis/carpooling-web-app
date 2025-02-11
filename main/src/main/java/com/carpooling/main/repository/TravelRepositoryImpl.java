@@ -105,13 +105,26 @@ public class TravelRepositoryImpl implements TravelRepository {
 
     @Override
     public void delete(int id) {
-        Travel travel = getTravelById(id);
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
+
+            Travel travel = session.get(Travel.class, id);
+            if (travel == null) {
+                System.out.println("Travel with ID " + id + " not found!");
+                throw new EntityNotFoundException("Travel not found with ID: " + id);
+            }
+
             session.delete(travel);
+            session.flush(); // Ensures changes are persisted immediately
             session.getTransaction().commit();
+            System.out.println("Deleted travel with ID: " + id);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
+
+
+
 
     @Override
     public void changeStatusToOpen(Travel travel) {
@@ -127,11 +140,18 @@ public class TravelRepositoryImpl implements TravelRepository {
     public void changeStatusToFinished(Travel travel) {
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            travel.setTravelStatus(TravelStatus.FINISHED);
-            session.merge(travel);
+
+            Travel existingTravel = session.get(Travel.class, travel.getId());
+            if (existingTravel == null) {
+                throw new EntityNotFoundException("Travel not found.");
+            }
+
+            existingTravel.setTravelStatus(TravelStatus.FINISHED);
+            session.update(existingTravel);  // Ensure update instead of merge
             session.getTransaction().commit();
         }
     }
+
 
     @Override
     public void changeStatusToOngoing(Travel travel) {

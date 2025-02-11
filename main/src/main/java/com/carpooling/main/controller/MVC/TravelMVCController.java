@@ -20,6 +20,7 @@ import com.carpooling.main.service.interfaces.*;
 import com.carpooling.main.helpers.AuthenticationHelper;
 import com.carpooling.main.helpers.mapper.TravelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,13 +68,15 @@ public class TravelMVCController {
             User loggedUser = authenticationHelper.tryGetUser(session);
             Travel singleTravel = travelService.getTravelById(id);
 
-            // Use the updated service method that returns requests only if the logged user is the driver.
+            // Get travel requests related to the logged-in user
             List<TravelRequest> requestsByPopulate = travelRequestService.getTravelRequestsByPopulate(loggedUser, id);
+
             boolean hasApplied = !requestsByPopulate.isEmpty();
             boolean isDriver = loggedUser.getId() == singleTravel.getDriver().getId();
             boolean isPartOfTravel = singleTravel.getPassengers().contains(loggedUser);
             boolean isCancelled = singleTravel.getTravelStatus().equals(TravelStatus.CANCELLED);
 
+            // Pass all attributes to the model
             model.addAttribute("isCancelled", isCancelled);
             model.addAttribute("isPartOfTravel", isPartOfTravel);
             model.addAttribute("isDriver", isDriver);
@@ -81,6 +84,7 @@ public class TravelMVCController {
             model.addAttribute("travel", singleTravel);
             model.addAttribute("logUser", loggedUser);
             model.addAttribute("requests", requestsByPopulate);
+
             return "SingleTravelView";
         } catch (AuthenticationFailedException e) {
             return "redirect:/auth/login";
@@ -89,6 +93,7 @@ public class TravelMVCController {
             return "NotFoundView";
         }
     }
+
 
     @PostMapping("/{travelId}/requests/{requestId}/accept")
     public String acceptRequest(@PathVariable int travelId, @PathVariable int requestId, HttpSession session) {
@@ -167,23 +172,16 @@ public class TravelMVCController {
         }
     }
 
-    @GetMapping("/{id}/cancel")
-    public String cancelTravel(@PathVariable("id") int id, HttpSession session, Model model) {
-        try {
-            User loggedInUser = authenticationHelper.tryGetUser(session);
-            Travel travel = travelService.getTravelById(id);
-            travelService.changeStatusToCancelled(loggedInUser, travel);
-            return "redirect:/travels/" + travel.getId();
-        } catch (AuthenticationFailedException e) {
-            return "redirect:/auth/login";
-        } catch (EntityNotFoundException e) {
-            model.addAttribute("error", e.getMessage());
-            return "NotFoundView";
-        } catch (UnauthorizedOperationException e) {
-            model.addAttribute("error", e.getMessage());
-        }
-        return "redirect:/travels/user";
+    @PostMapping("/{id}/delete")
+    public String deleteTravel(@PathVariable int id) {
+        System.out.println("Deleting travel with ID: " + id);  // Debugging
+        travelService.delete(id);
+        return "redirect:/home";
     }
+
+
+
+
 
     @PostMapping("/{travelId}/apply")
     public String applyForTravel(@PathVariable int travelId, HttpSession session, Model model) {
@@ -212,14 +210,48 @@ public class TravelMVCController {
         return "ApplySuccessView";
     }
 
+    @PostMapping("/{travelId}/finish")
+    public String finishTravel(@PathVariable int travelId, HttpSession session, Model model) {
+        try {
+            User loggedInUser = authenticationHelper.tryGetUser(session);
+            Travel travel = travelService.getTravelById(travelId);
+
+            if (loggedInUser.getId() != travel.getDriver().getId()) {
+                throw new UnauthorizedOperationException("Only the driver can finish the travel.");
+            }
+
+            travelService.changeStatusToFinished(travel); // ✅ Correct method call
+            return "redirect:/travels/" + travel.getId();
+        } catch (Exception e) {
+            model.addAttribute("error", e.getMessage());
+            return "ErrorView";
+        }
+    }
+
+
 
     @PostMapping("/{travelId}/withdraw")
     public String withdrawFromTravel(@PathVariable int travelId, HttpSession session, Model model) {
         try {
             User loggedInUser = authenticationHelper.tryGetUser(session);
             Travel travel = travelService.getTravelById(travelId);
+
+            // Find the request related to this user
             TravelRequest travelRequest = travelRequestService.getByApplicantAndTravel(loggedInUser, travel);
+
+            if (travelRequest == null) {
+                throw new EntityNotFoundException("You have not applied for this travel.");
+            }
+
+            // Remove the user from passengers list if they were already accepted
+            if (travel.getPassengers().contains(loggedInUser)) {
+                travel.getPassengers().remove(loggedInUser);
+                travel.setFreeSpots(travel.getFreeSpots() + 1); // Increase free spots
+            }
+
+            // Delete the request from DB
             travelRequestService.delete(travelRequest);
+
             model.addAttribute("loggedUser", loggedInUser);
             return "redirect:/travels/" + travel.getId();
         } catch (EntityNotFoundException e) {
@@ -233,15 +265,23 @@ public class TravelMVCController {
         }
     }
 
+
+
     @GetMapping("/{travelId}/driver/new-feedback")
     public String showCreateFeedbackForDriver(@PathVariable int travelId, Model model, HttpSession session) {
         try {
             User loggedUser = authenticationHelper.tryGetUser(session);
             Travel travel = travelService.getTravelById(travelId);
+
+            if (travel.getTravelStatus() != TravelStatus.FINISHED) {
+                throw new UnauthorizedOperationException("Feedback can only be given for completed travels.");
+            }
+
             User driver = travel.getDriver();
             if (feedbackService.feedbackByGiverAndReceiverExists(loggedUser, driver)) {
                 return String.format("redirect:/travels/%d/driver/update-feedback", travelId);
             }
+
             model.addAttribute("travel", travel);
             model.addAttribute("receiver", driver);
             model.addAttribute("feedback", new CreateFeedbackDto());
@@ -252,8 +292,12 @@ public class TravelMVCController {
         } catch (EntityNotFoundException e) {
             model.addAttribute("error", e.getMessage());
             return "NotFoundView";
+        } catch (UnauthorizedOperationException e) {
+            model.addAttribute("error", e.getMessage());
+            return "ConflictRequestView";
         }
     }
+
 
     @PostMapping("/{travelId}/driver/new-feedback")
     public String handleCreateFeedbackForDriver(@PathVariable int travelId,
@@ -267,6 +311,11 @@ public class TravelMVCController {
             }
             User loggedInUser = authenticationHelper.tryGetUser(session);
             Travel travel = travelService.getTravelById(travelId);
+
+            if (travel.getTravelStatus() != TravelStatus.FINISHED) {
+                throw new UnauthorizedOperationException("Feedback can only be given for completed travels.");
+            }
+
             User driver = travel.getDriver();
             Feedback feedback = feedbackMapper.fromDTO(driver.getId(), loggedInUser, travel, feedbackDTO);
             createFeedback(feedbackDTO, driver, feedback);
@@ -276,8 +325,12 @@ public class TravelMVCController {
         } catch (EntityNotFoundException e) {
             model.addAttribute("error", e.getMessage());
             return "NotFoundView";
+        } catch (UnauthorizedOperationException e) {
+            model.addAttribute("error", e.getMessage());
+            return "ConflictRequestView";
         }
     }
+
 
     @GetMapping("/{travelId}/driver/update-feedback")
     public String showUpdateFeedbackForDriver(@PathVariable int travelId, Model model, HttpSession session) {
@@ -330,11 +383,17 @@ public class TravelMVCController {
                                                  HttpSession session) {
         try {
             User loggedInUser = authenticationHelper.tryGetUser(session);
+            Travel travel = travelService.getTravelById(travelId);
+
+            if (travel.getTravelStatus() != TravelStatus.FINISHED) {
+                throw new UnauthorizedOperationException("Feedback can only be given for completed travels.");
+            }
+
             User receiver = userService.getById(passengerId);
             if (feedbackService.feedbackByGiverAndReceiverExists(loggedInUser, receiver)) {
                 return String.format("redirect:/travels/%d/passengers/%d/update-feedback", travelId, passengerId);
             }
-            Travel travel = travelService.getTravelById(travelId);
+
             model.addAttribute("travel", travel);
             model.addAttribute("receiver", receiver);
             model.addAttribute("feedback", new CreateFeedbackDto());
@@ -343,8 +402,12 @@ public class TravelMVCController {
         } catch (EntityNotFoundException e) {
             model.addAttribute("error", e.getMessage());
             return "NotFoundView";
+        } catch (UnauthorizedOperationException e) {
+            model.addAttribute("error", e.getMessage());
+            return "ConflictRequestView";
         }
     }
+
 
     @PostMapping("/{travelId}/passengers/{passengerId}/new-feedback")
     public String handleCreateFeedbackForPassenger(@Valid @ModelAttribute("feedback") CreateFeedbackDto feedbackDTO,
@@ -355,11 +418,17 @@ public class TravelMVCController {
                                                    HttpSession session) {
         try {
             User loggedInUser = authenticationHelper.tryGetUser(session);
-            User receiver = userService.getById(passengerId);
             Travel travel = travelService.getTravelById(travelId);
+
+            if (travel.getTravelStatus() != TravelStatus.FINISHED) {
+                throw new UnauthorizedOperationException("Feedback can only be given for completed travels.");
+            }
+
+            User receiver = userService.getById(passengerId);
             if (bindingResult.hasErrors()) {
                 return "CreateFeedbackView";
             }
+
             Feedback feedback = feedbackMapper.fromDTO(receiver.getId(), loggedInUser, travel, feedbackDTO);
             createFeedback(feedbackDTO, receiver, feedback);
             return "redirect:/users/" + receiver.getId();
@@ -368,11 +437,12 @@ public class TravelMVCController {
         } catch (EntityNotFoundException e) {
             model.addAttribute("error", e.getMessage());
             return "NotFoundView";
-        } catch (SelfFeedbackException e) {
+        } catch (UnauthorizedOperationException e) {
             model.addAttribute("error", e.getMessage());
             return "ConflictRequestView";
         }
     }
+
 
     @GetMapping("/{travelId}/passengers/{passengerId}/update-feedback")
     public String showUpdateFeedbackForPassenger(@PathVariable int travelId,

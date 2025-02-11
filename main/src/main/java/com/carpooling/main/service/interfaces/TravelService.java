@@ -26,7 +26,7 @@ public interface TravelService {
 
     void update(Travel travel);
 
-    void delete(User loggedInUser, int id);
+    void delete(int id);
 
     void changeStatusToOpen(User loggedInUser, Travel travel);
 
@@ -45,4 +45,6 @@ public interface TravelService {
     void setApplicationToDeclined(Travel travel, TravelRequest travelRequest);
 
     void setApprovedApplicationToDeclined(Travel travel, TravelRequest travelRequest);
+
+    void markAsFinished(Travel travel);
 }

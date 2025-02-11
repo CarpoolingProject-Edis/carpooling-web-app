@@ -1,0 +1,11 @@
+.back-to-travel {
+    font-size: 14px; /* Reduce text size */
+    padding: 5px 10px; /* Adjust padding */
+    width: auto; /* Allow it to shrink to fit content */
+    height: auto;
+}
+.feedback-comment {
+    width: 300px; /* Adjust width */
+    height: 80px; /* Reduce height */
+    resize: vertical; /* Allow vertical resizing only */
+}

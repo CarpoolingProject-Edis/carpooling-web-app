@@ -118,15 +118,23 @@ public class TravelRequestServiceImpl implements TravelRequestService {
             throw new AuthenticationFailedException("Only the driver can accept requests.");
         }
 
+        Travel travel = request.getTravel();
+
+        if (travel.getFreeSpots() <= 0) {
+            throw new IllegalStateException("No free spots available.");
+        }
+
         request.setApplicationStatus(ApplicationStatus.APPROVED);
-        request.getTravel().getPassengers().add(request.getPassenger());
+        travel.getPassengers().add(request.getPassenger());
+        travel.setFreeSpots(travel.getFreeSpots() - 1); // Decrease free spots by 1
 
         travelRequestRepository.update(request);
-        travelRepository.update(request.getTravel());
+        travelRepository.update(travel);
     }
 
     @Override
     public void rejectRequest(User driver, int travelId, int requestId) {
+
         TravelRequest request = travelRequestRepository.getById(requestId);
 
         if (request == null || request.getTravel().getId() != travelId) {
@@ -139,6 +147,13 @@ public class TravelRequestServiceImpl implements TravelRequestService {
 
         request.setApplicationStatus(ApplicationStatus.DECLINED);
         travelRequestRepository.update(request);
+
+        Travel travel = request.getTravel();
+        travel.getPassengers().remove(request.getPassenger());
+
+        travel.setFreeSpots(travel.getFreeSpots() + 1);
+
+        travelRepository.update(travel);
     }
 
 
