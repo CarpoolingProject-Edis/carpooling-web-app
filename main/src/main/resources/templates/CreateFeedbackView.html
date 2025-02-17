@@ -1,8 +1,8 @@
+
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Give Feedback</title>
-    <link rel="stylesheet" th:href="@{/css/feedback.css}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="bg-light">
@@ -17,7 +17,7 @@
 
     <!-- Show feedback form only if travel is finished -->
     <div th:if="${travel.travelStatus == T(com.carpooling.main.model.enums.TravelStatus).FINISHED}">
-        <form th:action="@{/travels/{travelId}/driver/new-feedback(travelId=${travel.id})}"
+        <form th:action="@{/travels/{travelId}/passengers/{passengerId}/new-feedback(travelId=${travel.id}, passengerId=${receiver.id})}"
               th:object="${feedback}"
               method="post">
 
@@ -27,7 +27,7 @@
             <div class="mb-3">
                 <label for="rating" class="form-label">Rating (1-5):</label>
                 <select id="rating" th:field="*{rating}" class="form-select" required>
-                    <option value="0">Select Rating</option>
+                    <option value="0" selected disabled>Select Rating</option>
                     <option value="1">1 - Very Bad</option>
                     <option value="2">2 - Bad</option>
                     <option value="3">3 - Okay</option>

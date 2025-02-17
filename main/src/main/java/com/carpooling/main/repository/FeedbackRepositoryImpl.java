@@ -33,11 +33,13 @@ public class FeedbackRepositoryImpl implements FeedbackRepository {
         }
     }
 
+    @Override
     public Feedback getFeedbackByGiverAndReceiver(User loggedInUser, User receiver) {
         try (Session session = sessionFactory.openSession()) {
             Query<Feedback> query = session.createQuery(
                     "from Feedback where createdBy = :giver and receivedBy = :receiver", Feedback.class);
-            query.setParameter("giver", loggedInUser).setParameter("receiver", receiver);
+            query.setParameter("giver", loggedInUser)
+                    .setParameter("receiver", receiver);
             List<Feedback> result = query.list();
             if (result.isEmpty()) {
                 throw new EntityNotFoundException(String.format("No feedback from %s to %s.",
@@ -53,7 +55,8 @@ public class FeedbackRepositoryImpl implements FeedbackRepository {
         try (Session session = sessionFactory.openSession()) {
             Query<Feedback> query = session.createQuery(
                     "from Feedback where createdBy = :giver and receivedBy = :receiver", Feedback.class);
-            query.setParameter("giver", giver).setParameter("receiver", receiver);
+            query.setParameter("giver", giver)
+                    .setParameter("receiver", receiver);
             List<Feedback> result = query.list();
             return !result.isEmpty();
         }
@@ -73,10 +76,7 @@ public class FeedbackRepositoryImpl implements FeedbackRepository {
             Query<Feedback> query = session.createQuery("from Feedback where receivedBy = :receiver", Feedback.class);
             query.setParameter("receiver", receiver);
             List<Feedback> result = query.list();
-            if (result.isEmpty()) {
-                return null;
-            }
-            return query.list();
+            return result.isEmpty() ? List.of() : result;
         }
     }
 
@@ -84,19 +84,18 @@ public class FeedbackRepositoryImpl implements FeedbackRepository {
     public List<Feedback> getUncommentedFeedbacksByReceiver(User receiver) {
         try (Session session = sessionFactory.openSession()) {
             Query<Feedback> query = session.createQuery(
-                    "select f from Feedback f " +
-                            "where f.receivedBy = :receiver",
-                    Feedback.class);
+                    "select f from Feedback f where f.receivedBy = :receiver", Feedback.class);
             query.setParameter("receiver", receiver);
             return query.list();
         }
     }
 
-
     @Override
     public void create(Feedback feedback) {
         try (Session session = sessionFactory.openSession()) {
+            session.beginTransaction();
             session.save(feedback);
+            session.getTransaction().commit();
         }
     }
 
@@ -116,5 +115,5 @@ public class FeedbackRepositoryImpl implements FeedbackRepository {
             session.delete(feedback);
             session.getTransaction().commit();
         }
-}
+    }
 }

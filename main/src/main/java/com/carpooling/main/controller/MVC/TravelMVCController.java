@@ -168,7 +168,7 @@ public class TravelMVCController {
         } catch (InvalidLocationException e) {
             bindingResult.rejectValue("startingPoint", "location_error", e.getMessage());
             bindingResult.rejectValue("destination", "location_error", e.getMessage());
-            return "CreateTravel";
+            return "CreateTravelView";
         }
     }
 
@@ -286,6 +286,7 @@ public class TravelMVCController {
             model.addAttribute("receiver", driver);
             model.addAttribute("feedback", new CreateFeedbackDto());
             model.addAttribute("isPassenger", true);
+
             return "CreateFeedbackView";
         } catch (AuthenticationFailedException e) {
             return "redirect:/auth/login";
@@ -297,6 +298,7 @@ public class TravelMVCController {
             return "ConflictRequestView";
         }
     }
+
 
 
     @PostMapping("/{travelId}/driver/new-feedback")
@@ -319,7 +321,8 @@ public class TravelMVCController {
             User driver = travel.getDriver();
             Feedback feedback = feedbackMapper.fromDTO(driver.getId(), loggedInUser, travel, feedbackDTO);
             createFeedback(feedbackDTO, driver, feedback);
-            return "redirect:/users/" + driver.getId();
+            return "redirect:/feedback/success";
+
         } catch (AuthenticationFailedException e) {
             return "redirect:/auth/login";
         } catch (EntityNotFoundException e) {
@@ -331,7 +334,6 @@ public class TravelMVCController {
         }
     }
 
-
     @GetMapping("/{travelId}/driver/update-feedback")
     public String showUpdateFeedbackForDriver(@PathVariable int travelId, Model model, HttpSession session) {
         try {
@@ -339,6 +341,11 @@ public class TravelMVCController {
             Travel travel = travelService.getTravelById(travelId);
             User driver = travel.getDriver();
             Feedback existingFeedback = feedbackService.getFeedbackByGiverAndReceiver(loggedInUser, driver);
+
+            if (existingFeedback == null) {
+                return "redirect:/travels/" + travelId + "CreateFeedbackView";
+            }
+
             FeedbackComment existingComment = feedbackCommentService.getCommentByFeedback(existingFeedback);
             boolean commentExists = existingComment != null;
             model.addAttribute("travel", travel);
@@ -356,6 +363,7 @@ public class TravelMVCController {
             return "redirect:/auth/login";
         }
     }
+
 
     @PostMapping("/{travelId}/driver/update-feedback")
     public String handleUpdateFeedbackForDriver(@PathVariable int travelId,
@@ -375,7 +383,6 @@ public class TravelMVCController {
             return "NotFoundView";
         }
     }
-
     @GetMapping("/{travelId}/passengers/{passengerId}/new-feedback")
     public String showCreateFeedbackForPassenger(@PathVariable int travelId,
                                                  @PathVariable int passengerId,
@@ -408,7 +415,6 @@ public class TravelMVCController {
         }
     }
 
-
     @PostMapping("/{travelId}/passengers/{passengerId}/new-feedback")
     public String handleCreateFeedbackForPassenger(@Valid @ModelAttribute("feedback") CreateFeedbackDto feedbackDTO,
                                                    @PathVariable int travelId,
@@ -431,7 +437,8 @@ public class TravelMVCController {
 
             Feedback feedback = feedbackMapper.fromDTO(receiver.getId(), loggedInUser, travel, feedbackDTO);
             createFeedback(feedbackDTO, receiver, feedback);
-            return "redirect:/users/" + receiver.getId();
+
+            return "FeedbackSuccessView";
         } catch (AuthenticationFailedException e) {
             return "redirect:/auth/login";
         } catch (EntityNotFoundException e) {

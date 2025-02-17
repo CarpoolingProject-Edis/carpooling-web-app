@@ -36,16 +36,10 @@ public class FeedbackCommentRepositoryImpl implements FeedbackCommentRepository 
     public List<FeedbackComment> getCommentsByReceiver(User receiver) {
         try (Session session = sessionFactory.openSession()) {
             Query<FeedbackComment> query = session.createQuery(
-                    "select fc from FeedbackComment fc" +
-                            " inner join fc.feedback f " +
-                            "where f.receivedBy = :receiver",
-                    FeedbackComment.class);
+                    "select fc from FeedbackComment fc inner join fc.feedback f where f.receivedBy = :receiver", FeedbackComment.class);
             query.setParameter("receiver", receiver);
             List<FeedbackComment> result = query.list();
-            if (result.isEmpty()) {
-                return null;
-            }
-            return result;
+            return result.isEmpty() ? List.of() : result;
         }
     }
 
@@ -67,17 +61,16 @@ public class FeedbackCommentRepositoryImpl implements FeedbackCommentRepository 
                     session.createQuery("from FeedbackComment where feedback = :feedback", FeedbackComment.class);
             query.setParameter("feedback", feedback);
             List<FeedbackComment> result = query.list();
-            if (result.isEmpty()) {
-                return null;
-            }
-            return result.get(0);
+            return result.isEmpty() ? null : result.get(0);
         }
     }
 
     @Override
     public void create(FeedbackComment feedbackComment) {
         try (Session session = sessionFactory.openSession()) {
+            session.beginTransaction();
             session.persist(feedbackComment);
+            session.getTransaction().commit();
         }
     }
 
