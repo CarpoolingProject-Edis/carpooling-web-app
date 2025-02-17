@@ -1,94 +1,119 @@
+create table cars
+(
+    id           int auto_increment
+        primary key,
+    model        varchar(32)                                                                    not null,
+    year         int                                                                            not null,
+    vehicle_type enum ('NONE', 'SEDAN', 'SUV', 'ELECTRIC', 'COMBI', 'MINIVAN', 'JEEP', 'OTHER') not null
+);
+
+create table photos
+(
+    id        int auto_increment
+        primary key,
+    photo_url varchar(200) not null
+);
+
 create table users
 (
-    UserID       bigint unsigned auto_increment
+    id           int auto_increment
         primary key,
-    Username     varchar(20)                            not null,
-    Password     varchar(100)                           not null,
-    FirstName    varchar(20)                            not null,
-    LastName     varchar(20)                            not null,
-    Email        varchar(50)                            not null,
-    PhoneNumber  char(10)                               not null,
-    ProfilePhoto text                                   null,
-    IsBlocked    tinyint(1) default 0                   null,
-    CreatedAt    timestamp  default current_timestamp() null,
-    constraint Email
+    firstName    varchar(20)                     not null,
+    lastName     varchar(20)                     not null,
+    Email        varchar(255)                    not null,
+    Username     varchar(20)                     not null,
+    Password     varchar(20)                     not null,
+    phoneNumber  varchar(10)                     not null,
+    car_id       int                             null,
+    photo_url_id int                             null,
+    rating       double                          null,
+    role         enum ('ADMIN', 'USER', 'GUEST') not null,
+    status       enum ('ACTIVE', 'BLOCKED')      not null,
+    constraint users_pk
         unique (Email),
-    constraint PhoneNumber
-        unique (PhoneNumber),
-    constraint Username
-        unique (Username)
+    constraint users_pk2
+        unique (Username),
+    constraint users_pk3
+        unique (phoneNumber),
+    constraint users_cars_id_fk
+        foreign key (car_id) references cars (id),
+    constraint users_photos_id_fk
+        foreign key (photo_url_id) references photos (id)
 );
 
 create table travels
 (
-    TravelID      int auto_increment
+    id             int auto_increment
         primary key,
-    OrganizerID   bigint unsigned                        not null,
-    StartPoint    varchar(100)                           not null,
-    EndPoint      varchar(100)                           not null,
-    DepartureTime timestamp                              not null,
-    FreeSpots     int                                    not null,
-    Comments      varchar(255)                           null,
-    IsCompleted   tinyint(1) default 0                   null,
-    CreatedAt     timestamp  default current_timestamp() null,
-    constraint travels_ibfk_1
-        foreign key (OrganizerID) references users (UserID)
-            on update cascade on delete cascade
+    startPoint     varchar(100)                                              not null,
+    endPoint       varchar(100)                                              not null,
+    free_spots     int                                                       not null,
+    driver_note    varchar(200)                                              null,
+    driver_id      int                                                       not null,
+    distance       varchar(32)                                               not null,
+    departure_time datetime                                                  not null,
+    status         enum ('OPEN', 'CANCELLED', 'FULL', 'ONGOING', 'FINISHED') not null,
+    constraint travel_users_id_fk
+        foreign key (driver_id) references users (id)
 );
 
-create table applications
+create table feedbacks
 (
-    ApplicationID int auto_increment
+    id          int auto_increment
         primary key,
-    TravelID      int                                      not null,
-    UserID        bigint unsigned                          not null,
-    Status        enum ('Pending', 'Approved', 'Rejected') not null,
-    AppliedAt     timestamp default current_timestamp()    null,
-    constraint applications_ibfk_1
-        foreign key (TravelID) references travels (TravelID)
-            on update cascade on delete cascade,
-    constraint applications_ibfk_2
-        foreign key (UserID) references users (UserID)
-            on update cascade on delete cascade
+    travel_id   int    not null,
+    giver_id    int    not null,
+    receiver_id int    not null,
+    rating      double not null,
+    constraint feedbacks_travels_id_fk
+        foreign key (travel_id) references travels (id),
+    constraint feedbacks_users_id_fk
+        foreign key (giver_id) references users (id),
+    constraint feedbacks_users_id_fk2
+        foreign key (receiver_id) references users (id)
 );
 
-create index TravelID
-    on applications (TravelID);
-
-create index UserID
-    on applications (UserID);
-
-create table feedback
+create table feedback_comments
 (
-    FeedbackID int auto_increment
+    id          int auto_increment
         primary key,
-    TravelID   int                                   not null,
-    FromUserID bigint unsigned                       not null,
-    ToUserID   bigint unsigned                       not null,
-    Rating     enum ('1', '2', '3', '4', '5')        not null,
-    Comment    varchar(255)                          null,
-    CreatedAt  timestamp default current_timestamp() null,
-    constraint feedback_ibfk_1
-        foreign key (TravelID) references travels (TravelID)
-            on update cascade on delete cascade,
-    constraint feedback_ibfk_2
-        foreign key (FromUserID) references users (UserID)
-            on update cascade on delete cascade,
-    constraint feedback_ibfk_3
-        foreign key (ToUserID) references users (UserID)
-            on update cascade on delete cascade
+    feedback_id int          not null,
+    content     varchar(255) not null,
+    constraint feedback_comments_feedbacks_id_fk
+        foreign key (feedback_id) references feedbacks (id)
 );
 
-create index FromUserID
-    on feedback (FromUserID);
+create index travel_destinations_id_fk
+    on travels (endPoint);
 
-create index ToUserID
-    on feedback (ToUserID);
+create index travel_driver_comments_id_fk
+    on travels (driver_note);
 
-create index TravelID
-    on feedback (TravelID);
+create table travels_passengers
+(
+    id           int auto_increment
+        primary key,
+    travel_id    int not null,
+    passenger_id int not null,
+    constraint travels_passengers_travels_id_fk
+        foreign key (travel_id) references travels (id),
+    constraint travels_passengers_users_id_fk
+        foreign key (passenger_id) references users (id)
+);
 
-create index OrganizerID
-    on travels (OrganizerID);
+create table user_applications
+(
+    id        int auto_increment
+        primary key,
+    user_id   int                                      not null,
+    travel_id int                                      not null,
+    status    enum ('PENDING', 'DECLINED', 'APPROVED') null,
+    constraint user_applications_travels_id_fk
+        foreign key (travel_id) references travels (id),
+    constraint user_applications_users_id_fk
+        foreign key (user_id) references users (id)
+);
 
+create index user_applications_application_statuses_id_fk
+    on user_applications (status);
 
