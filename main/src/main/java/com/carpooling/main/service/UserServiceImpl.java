@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Comparator;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -56,6 +57,11 @@ public class UserServiceImpl implements UserService {
     public void setUserToAdmin(User user, User admin) {
         checkStatusIsAdmin(admin);
         userRepository.setUserToAdmin(user);
+    }
+
+    @Override
+    public List<Map<String, Object>> getAllUsers() {
+        return userRepository.getAllUsers();  // ✅ Fetch users from database
     }
 
     @Override

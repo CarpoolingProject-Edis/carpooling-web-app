@@ -4,6 +4,7 @@ import com.carpooling.main.model.User;
 import com.carpooling.main.model.Car;
 
 import java.util.List;
+import java.util.Map;
 
 public interface UserService {
 
@@ -12,7 +13,7 @@ public interface UserService {
     User getByPhoneNumber(String phoneNumber);
 
     User getByEmail(String email);
-
+    List<Map<String, Object>> getAllUsers();
     List<User> getTop10UsersWithHighestRating();
 
     List<User> getUsersWithHighestDriverRating(int limit);

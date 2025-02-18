@@ -4,6 +4,7 @@ package com.carpooling.main.repository.interfaces;
 import com.carpooling.main.model.User;
 
 import java.util.List;
+import java.util.Map;
 
 public interface UserRepository {
     User getById(int id);
@@ -13,6 +14,8 @@ public interface UserRepository {
     User getByEmail(String email);
 
     User getByPhoneNumber(String phoneNumber);
+
+    List<Map<String, Object>> getAllUsers();
 
     void create(User user);
 

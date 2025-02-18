@@ -6,25 +6,25 @@ import com.carpooling.main.model.User;
 import com.carpooling.main.model.enums.UserRole;
 import com.carpooling.main.model.enums.UserStatus;
 import com.carpooling.main.repository.interfaces.UserRepository;
-import jakarta.transaction.Transactional;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.StaleObjectStateException;
-import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public class UserRepositoryImpl implements UserRepository {
 
     private final SessionFactory sessionFactory;
-
+    private final JdbcTemplate jdbcTemplate;
     @Autowired
-    public UserRepositoryImpl(SessionFactory sessionFactory) {
+    public UserRepositoryImpl(SessionFactory sessionFactory, JdbcTemplate jdbcTemplate) {
         this.sessionFactory = sessionFactory;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
@@ -76,6 +76,13 @@ public class UserRepositoryImpl implements UserRepository {
             return result.get(0);
         }
     }
+
+    @Override
+    public List<Map<String, Object>> getAllUsers() {
+        String sql = "SELECT * FROM users";
+        return jdbcTemplate.queryForList(sql);
+    }
+
 
     @Override
     public void changeStatusToBlocked(User user) {

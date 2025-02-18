@@ -19,6 +19,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/users")
@@ -64,24 +65,47 @@ public class UserMVCController {
         }
     }
 
+    @GetMapping("/users")
+    public String showAllUsers(Model model) {
+        List<Map<String, Object>> users = userService.getAllUsers();  // ✅ Fetch users
+        model.addAttribute("users", users);  // ✅ Pass to Thymeleaf
+        return "UsersView";
+    }
+
     @GetMapping("/profile")
     public String showProfile(HttpSession session, Model model) {
         try {
             User loggedUser = authenticationHelper.tryGetUser(session);
             List<FeedbackComment> feedbacks = feedbackService.getUniqueFeedbacks(loggedUser);
-            model.addAttribute("feedbacksForUser", feedbacks);
+
             model.addAttribute("user", loggedUser);
+            model.addAttribute("feedbacksForUser", feedbacks);
+            model.addAttribute("allUsers", userService.getAllUsers()); // ✅ Pass all users for the sidebar
+
             return "ProfileView";
         } catch (AuthenticationFailedException e) {
             return "redirect:/auth/login";
         }
     }
+
     @GetMapping("/profile/{id}")
-    public String showProfilePage(@PathVariable int id, Model model) {
-        User user = userService.getById(id);
-        model.addAttribute("user", user);
-        return "ProfileView";
+    public String showProfilePage(@PathVariable int id, Model model, HttpSession session) {
+        try {
+            User loggedUser = authenticationHelper.tryGetUser(session);
+            User user = userService.getById(id);
+            List<FeedbackComment> feedbacks = feedbackService.getUniqueFeedbacks(user);
+
+            model.addAttribute("user", user);
+            model.addAttribute("feedbacksForUser", feedbacks);
+            model.addAttribute("allUsers", userService.getAllUsers()); // ✅ Sidebar users
+            model.addAttribute("isAdmin", loggedUser.getUserRole() == UserRole.ADMIN);
+
+            return "ProfileView";
+        } catch (Exception e) {
+            return "redirect:/auth/login";
+        }
     }
+
 
 
     @GetMapping("/{id}")
@@ -112,20 +136,24 @@ public class UserMVCController {
 
     @GetMapping("/{id}/update/password")
     public String showUpdatePasswordPage(@PathVariable int id, HttpSession session, Model model) {
-        User currentUser = userService.getById(id);
         try {
             User logUser = authenticationHelper.tryGetUser(session);
-            if (!(logUser.getUserRole().toString().equals("Admin") || logUser.getUsername().equals(currentUser.getUsername()))) {
+            User currentUser = userService.getById(id);
+
+            if (!(logUser.getUserRole() == UserRole.ADMIN || logUser.getUsername().equals(currentUser.getUsername()))) {
                 model.addAttribute("error", "No access");
                 return "AccessDenied";
             }
-        } catch (AuthenticationFailedException e) {
+
+            model.addAttribute("user", new UpdateUserPasswordDto());
+            model.addAttribute("userId", id);  // ✅ Ensure userId is added for Thymeleaf
+
+            return "UpdatePasswordView";
+        } catch (Exception e) {
             return "redirect:/auth/login";
         }
-        UpdateUserPasswordDto dto = userMapper.toDto(currentUser);
-        model.addAttribute("user", dto); // Ensure this is added to the model
-        return "UpdatePasswordView";
     }
+
 
 
     @PostMapping("/{id}/update/password")
@@ -134,41 +162,40 @@ public class UserMVCController {
                                      BindingResult bindingResult,
                                      HttpSession session,
                                      Model model) {
-        User logUser = authenticationHelper.tryGetUser(session);
-        User userToUpdate = userService.getById(id);
+        System.out.println("🚀 Received POST request to update password for user ID: " + id);
+
         try {
+            User logUser = authenticationHelper.tryGetUser(session);
+            User userToUpdate = userService.getById(id);
+
             if (!(logUser.getUserRole().equals(UserRole.ADMIN) || logUser.getUsername().equals(userToUpdate.getUsername()))) {
                 model.addAttribute("error", "No access");
+                System.out.println("❌ Access Denied for user ID: " + id);
                 return "AccessDenied";
             }
-        } catch (AuthenticationFailedException e) {
+
+            if (bindingResult.hasErrors()) {
+                System.out.println("❌ Validation Errors: " + bindingResult.getAllErrors());
+                model.addAttribute("userId", id);
+                return "UpdatePasswordView";
+            }
+            // **Check if new passwords match**
+            if (!userDto.getChangePassword().equals(userDto.getChangePasswordConfirm())) {
+                bindingResult.rejectValue("changePasswordConfirm", "password_error", "New passwords do not match.");
+                System.out.println("❌ New passwords do not match for user ID: " + id);
+                model.addAttribute("userId", id);
+                return "UpdatePasswordView";
+            }
+
+            // **Hash and save new password**
+            userToUpdate.setPassword(userDto.getChangePassword());
+            userService.update(userToUpdate, logUser, id);
+            System.out.println("✅ Password updated successfully for user ID: " + id);
+
+            return "redirect:/users/profile";
+        } catch (Exception e) {
+            System.out.println("❌ Authentication Failed for user ID: " + id);
             return "redirect:/auth/login";
-        }
-
-        if (bindingResult.hasErrors()) {
-            return "UpdatePasswordView";
-        }
-
-
-        if (!userDto.getPassword().equals(userToUpdate.getPassword())) {
-            bindingResult.rejectValue("password", "password_error", "Passwords must match!");
-            return "UpdatePasswordView";
-        }
-
-
-        if (!userDto.getChangePassword().equals(userDto.getChangePasswordConfirm())) {
-            bindingResult.rejectValue("changePasswordConfirm", "password_error", "Password confirmation should match password.");
-            return "UpdatePasswordView";
-        }
-
-        try {
-            User user = userMapper.fromDto(id, userDto);
-
-            userService.update(user, logUser, id);
-            return "redirect:/auth/login";
-        } catch (EntityDuplicateException e) {
-            bindingResult.rejectValue("username", "username_error", e.getMessage());
-            return "UpdatePasswordView";
         }
     }
 
